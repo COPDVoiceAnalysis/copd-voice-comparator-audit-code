@@ -1,0 +1,102 @@
+# ============================================================================
+# STANDARD CLASSIFICATION EXPERIMENT MATRIX
+# Only experimental variables - hyperparameters are in pipeline_config.yml
+# Uses Snakemake wildcard system for experiment combinations
+# ============================================================================
+
+# Experiment metadata
+date: "2025-08-13"
+
+# Preprocessing variants (for Snakemake wildcards)
+preproc_variants:
+- name: norm_on
+  normalize: true
+- name: norm_off
+  normalize: false
+
+# Scope variants: 3-level incremental view
+# 1. demographics-only baseline, 2. voice-only, 3. voice + demographics (full model)
+#
+# *_individual variants use the per-condition comorbidity indicators
+# (resolved at config-generation time from the task's ps_covariates_file,
+# see scopes: in pipeline_config.yml). They exist so the demographics-only
+# baseline is symmetric with the PS-overlap weighting covariate set; the
+# default *_comorbidity variants still use the 3-level comorbidity_count_bin.
+scope_variants:
+# age_sex_only configs are generated and submitted out-of-band (see
+# scripts/run_age_sex_only_baseline.sh) to avoid triggering a full
+# snakemake DAG re-walk that re-extracts norm_off features.
+# - age_sex_only
+# - comorbidity_only
+- age_only
+- age_sex_comorbidity
+- age_sex_comorbidity_individual
+- voice_only
+# - voice_plus_age_sex
+- voice_plus_age_sex_comorbidity
+- voice_plus_age_sex_comorbidity_individual
+
+# Feature variants (for Snakemake wildcards; used for voice_* scopes; demographics_only used for age_sex_only, comorbidity_only, age_sex_comorbidity)
+feature_variants:
+- parsel_a_egemaps
+- parsel_a_spectral
+- parsel_a_basic_acoustics
+- parsel_a_temporal
+# - parsel_a_all_but_mfcc
+- parsel_a_all_features
+- parsel_i_egemaps
+- parsel_i_spectral
+- parsel_i_basic_acoustics
+- parsel_i_temporal
+# - parsel_i_all_but_mfcc
+- parsel_i_all_features
+- parsel_o_egemaps
+- parsel_o_spectral
+- parsel_o_basic_acoustics
+- parsel_o_temporal
+# - parsel_o_all_but_mfcc
+- parsel_o_all_features
+- parsel_o_egemaps
+- parsel_all_vowels_egemaps
+- parsel_all_vowels_spectral
+- parsel_all_vowels_basic_acoustics
+- parsel_all_vowels_temporal
+# - parsel_all_vowels_all_but_mfcc
+- parsel_all_vowels_all_features
+- parsel_poem_egemaps
+- parsel_poem_spectral
+- parsel_poem_basic_acoustics
+- parsel_poem_temporal
+# - parsel_poem_all_but_mfcc
+- parsel_poem_all_features
+- wav2vec_poem
+- wav2vec_a
+- wav2vec_i
+- wav2vec_o
+- wav2vec_all_vowels
+- wav2vec_poem_parsel_o_basic_acoustics
+
+# Hyperparameter variants
+# These reference the hyperparameter sets defined in pipeline_config.yml
+hyperparam_variants:
+# - basic
+- extended
+
+# Classification tasks
+classification_tasks:
+# - copd_classification
+# - copd_classification_charite_only
+- copd_classification_uk_only
+- copd_classification_charite_complete  # 206 participants with all 4 recording categories
+- copd_classification_charite_psm       # ~45 persons, propensity-score-matched (balanced-by-design primary)
+
+# Classifier variants
+classifier_variants:
+- RandomForestClassifier
+- SVC
+- LogisticRegression
+
+# Splitting variants
+splitting_variants:
+- unsplit
+- split

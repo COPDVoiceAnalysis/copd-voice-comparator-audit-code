@@ -1,0 +1,11 @@
+# Data and outputs are never part of this repository
+data/
+outputs/
+mlruns/
+
+# Environments and caches
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.DS_Store

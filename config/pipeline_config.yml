@@ -1,0 +1,559 @@
+# ============================================================================
+# PIPELINE CONSTANTS - Infrastructure & Hyperparameter Search Spaces
+# ============================================================================
+
+# Optional: PS/overlap weighting covariates (age, sex + comorbidity_count_bin). Path may use {date} (filled from snakemake_matrix).
+# Stored in Stimmaufnahmen (RAW_DIR); built from Excel by rule build_comorbidities.
+ps_covariates_file: "/data/cephfs-1/work/groups/mittermaier/stimmaufnahmen/{date}/comorbidities.csv"
+
+# Basenames for comorbidities build (files must exist in RAW_DIR after sync).
+# Override comorbidities_xlsx_basename if your file has a different name (e.g. comorbidities_2026_01_28.xlsx).
+comorbidities_xlsx_basename: "comorbidities_2026_01_28.xlsx"
+voice_audio_id_xlsx_basename: "voice_audio_id.xlsx"
+
+# Feature variant configurations
+# Feature groups explained:
+# - include_egemaps_features: 88 standardized eGeMAPS v02 features (prefixed "egemaps_")
+#   Includes MFCCs, F0, HNR, jitter, shimmer, formants, spectral descriptors
+# - include_basic_acoustics: Custom Parselmouth F0, HNR, jitter, shimmer, intensity, semitone stats
+#   Note: Overlaps conceptually with eGeMAPS but uses different names (both included when both enabled)
+# - include_spectral_analysis + include_mfcc_derivatives: Spectral group = base MFCCs, formants, spectral measures
+#   (alpha_ratio, hammarberg_index, spectral_flux, slopes) plus delta/delta-delta MFCCs. Used together for parsel_X_spectral.
+# - include_advanced_voice_quality: CPP (cepstral peak prominence) and DSI (dysphonia severity index)
+# - include_temporal_features: Voiced/unvoiced durations, pseudo-syllable rate
+#
+# Mapping to results table columns:
+# - parsel_X_spectral → "Spectral features" column (includes spectral_analysis + mfcc_derivatives)
+# - parsel_X_basic_acoustics → "Basic acoustics" column
+# - parsel_X_egemaps → "eGeMAPS" column
+# - parsel_X_temporal → "Temporal features" column
+# - parsel_X_all_features → "All acoustic features" column
+# - wav2vec_X → "wav2vec2" column
+#
+feature_variant_configs:
+  __egemaps: &egemaps
+    include_basic_acoustics: false
+    include_egemaps_features: true
+    include_advanced_voice_quality: false
+    include_spectral_analysis: false
+    include_mfcc_derivatives: false
+    include_temporal_features: false
+
+  __spectral: &spectral
+    include_basic_acoustics: false
+    include_egemaps_features: false
+    include_advanced_voice_quality: false
+    include_spectral_analysis: true
+    include_mfcc_derivatives: true
+    include_temporal_features: false
+
+  __basic_acoustics: &basic_acoustics
+    include_basic_acoustics: true
+    include_egemaps_features: false
+    include_advanced_voice_quality: false
+    include_spectral_analysis: false
+    include_mfcc_derivatives: false
+    include_temporal_features: false
+
+  __temporal: &temporal
+    include_basic_acoustics: false
+    include_egemaps_features: false
+    include_advanced_voice_quality: false
+    include_spectral_analysis: false
+    include_mfcc_derivatives: false
+    include_temporal_features: true
+
+  __all_but_mfcc: &all_but_mfcc
+    include_basic_acoustics: true
+    include_egemaps_features: true
+    include_advanced_voice_quality: true
+    include_spectral_analysis: true
+    include_mfcc_derivatives: false
+    include_temporal_features: true
+
+  __all_features: &all_features
+    include_basic_acoustics: true
+    include_egemaps_features: true
+    include_advanced_voice_quality: true
+    include_spectral_analysis: true
+    include_mfcc_derivatives: true
+    include_temporal_features: true
+
+  # Vowel "a" variations
+  parsel_a_egemaps:
+    recordings_parsel: [ "a" ]
+    recordings_wav2vec2: []
+    parselmouth_config: *egemaps
+
+  # Spectral: spectral analysis + MFCC derivatives (single group)
+  parsel_a_spectral:
+    recordings_parsel: [ "a" ]
+    recordings_wav2vec2: []
+    parselmouth_config: *spectral
+
+  parsel_a_basic_acoustics:
+    recordings_parsel: [ "a" ]
+    recordings_wav2vec2: []
+    parselmouth_config: *basic_acoustics
+
+  # Temporal only
+  parsel_a_temporal:
+    recordings_parsel: [ "a" ]
+    recordings_wav2vec2: []
+    parselmouth_config: *temporal
+
+  # All but MFCC derivatives
+  parsel_a_all_but_mfcc:
+    recordings_parsel: [ "a" ]
+    recordings_wav2vec2: []
+    parselmouth_config: *all_but_mfcc
+
+  # All feature groups
+  parsel_a_all_features:
+    recordings_parsel: [ "a" ]
+    recordings_wav2vec2: []
+    parselmouth_config: *all_features
+
+  wav2vec_a:
+    recordings_parsel: []
+    recordings_wav2vec2: [ "a" ]
+    wav2vec2_layer: 4
+    wav2vec2_embedding_statistics: "mean"
+    parselmouth_config: *egemaps
+
+  # Vowel "i" variations
+  parsel_i_egemaps:
+    recordings_parsel: [ "i" ]
+    recordings_wav2vec2: []
+    parselmouth_config: *egemaps
+
+  # Spectral: spectral analysis + MFCC derivatives (single group)
+  parsel_i_spectral:
+    recordings_parsel: [ "i" ]
+    recordings_wav2vec2: []
+    parselmouth_config: *spectral
+
+  parsel_i_basic_acoustics:
+    recordings_parsel: [ "i" ]
+    recordings_wav2vec2: []
+    parselmouth_config: *basic_acoustics
+
+  # Temporal only
+  parsel_i_temporal:
+    recordings_parsel: [ "i" ]
+    recordings_wav2vec2: []
+    parselmouth_config: *temporal
+
+  # All but MFCC derivatives
+  parsel_i_all_but_mfcc:
+    recordings_parsel: [ "i" ]
+    recordings_wav2vec2: []
+    parselmouth_config: *all_but_mfcc
+
+  # All feature groups
+  parsel_i_all_features:
+    recordings_parsel: [ "i" ]
+    recordings_wav2vec2: []
+    parselmouth_config: *all_features
+    
+  wav2vec_i:
+    recordings_parsel: []
+    recordings_wav2vec2: [ "i" ]
+    wav2vec2_layer: 4
+    wav2vec2_embedding_statistics: "mean"
+    parselmouth_config: *egemaps
+
+  # Vowel "o" variations
+  parsel_o_egemaps:
+    recordings_parsel: [ "o" ]
+    recordings_wav2vec2: []
+    parselmouth_config: *egemaps
+
+  # Spectral: spectral analysis + MFCC derivatives (single group)
+  parsel_o_spectral:
+    recordings_parsel: [ "o" ]
+    recordings_wav2vec2: []
+    parselmouth_config: *spectral
+
+  parsel_o_basic_acoustics:
+    recordings_parsel: [ "o" ]
+    recordings_wav2vec2: []
+    parselmouth_config: *basic_acoustics
+
+  # Temporal only
+  parsel_o_temporal:
+    recordings_parsel: [ "o" ]
+    recordings_wav2vec2: []
+    parselmouth_config: *temporal
+
+  # All but MFCC derivatives
+  parsel_o_all_but_mfcc:
+    recordings_parsel: [ "o" ]
+    recordings_wav2vec2: []
+    parselmouth_config: *all_but_mfcc
+
+  # All feature groups
+  parsel_o_all_features:
+    recordings_parsel: [ "o" ]
+    recordings_wav2vec2: []
+    parselmouth_config: *all_features
+
+  wav2vec_o:
+    recordings_parsel: []
+    recordings_wav2vec2: [ "o" ]
+    wav2vec2_layer: 4
+    wav2vec2_embedding_statistics: "mean"
+    parselmouth_config: *egemaps
+
+  # All vowels combination variations
+  parsel_all_vowels_egemaps:
+    recordings_parsel: [ "a", "i", "o" ]
+    recordings_wav2vec2: []
+    parselmouth_config: *egemaps
+
+  # Spectral: spectral analysis + MFCC derivatives (single group)
+  parsel_all_vowels_spectral:
+    recordings_parsel: [ "a", "i", "o" ]
+    recordings_wav2vec2: []
+    parselmouth_config: *spectral
+
+  # All but MFCC derivatives
+  parsel_all_vowels_all_but_mfcc:
+    recordings_parsel: [ "a", "i", "o" ]
+    recordings_wav2vec2: []
+    parselmouth_config: *all_but_mfcc
+
+  parsel_all_vowels_basic_acoustics:
+    recordings_parsel: [ "a", "i", "o" ]
+    recordings_wav2vec2: []
+    parselmouth_config: *basic_acoustics
+
+  # Temporal only
+  parsel_all_vowels_temporal:
+    recordings_parsel: [ "a", "i", "o" ]
+    recordings_wav2vec2: []
+    parselmouth_config: *temporal
+
+  # All feature groups
+  parsel_all_vowels_all_features:
+    recordings_parsel: [ "a", "i", "o" ]
+    recordings_wav2vec2: []
+    parselmouth_config: *all_features
+
+  wav2vec_all_vowels:
+    recordings_parsel: []
+    recordings_wav2vec2: [ "a", "i", "o" ]
+    wav2vec2_layer: 4
+    wav2vec2_embedding_statistics: "mean"
+    parselmouth_config: *egemaps
+
+  # Parselm poem
+  parsel_poem_egemaps:
+    recordings_parsel: [ "poem" ]
+    recordings_wav2vec2: []
+    parselmouth_config: *egemaps
+
+  # Spectral: spectral analysis + MFCC derivatives (single group)
+  parsel_poem_spectral:
+    recordings_parsel: [ "poem" ]
+    recordings_wav2vec2: []
+    parselmouth_config: *spectral
+
+  # All but MFCC derivatives
+  parsel_poem_all_but_mfcc:
+    recordings_parsel: [ "poem" ]
+    recordings_wav2vec2: []
+    parselmouth_config: *all_but_mfcc
+
+  parsel_poem_basic_acoustics:
+    recordings_parsel: [ "poem" ]
+    recordings_wav2vec2: []
+    parselmouth_config: *basic_acoustics
+
+  # Temporal only
+  parsel_poem_temporal:
+    recordings_parsel: [ "poem" ]
+    recordings_wav2vec2: []
+    parselmouth_config: *temporal
+
+  # All feature groups
+  parsel_poem_all_features:
+    recordings_parsel: [ "poem" ]
+    recordings_wav2vec2: []
+    parselmouth_config: *all_features
+
+
+# Wav2vec2
+  wav2vec_poem:
+    recordings_parsel: []
+    recordings_wav2vec2: [ "poem" ]
+    wav2vec2_layer: 4
+    wav2vec2_embedding_statistics: "mean"
+    parselmouth_config: *egemaps
+
+  # Combined: wav2vec poem + parselmouth vowel /o/ basic acoustics
+  wav2vec_poem_parsel_o_basic_acoustics:
+    recordings_parsel: ["o"]
+    recordings_wav2vec2: ["poem"]
+    wav2vec2_layer: 4
+    wav2vec2_embedding_statistics: "mean"
+    parselmouth_config: *basic_acoustics
+
+  # Demographics-only scopes (age_sex_only, comorbidity_only, age_sex_comorbidity); voice not loaded at runtime (include_voice_features: false)
+  demographics_only:
+    recordings_parsel: []
+    recordings_wav2vec2: []
+    demographics_only: true
+    wav2vec2_layer: 4
+    wav2vec2_embedding_statistics: "mean"
+    parselmouth_config: *egemaps
+
+# ============================================================================
+# Propensity-score matching (cohort construction)
+# ----------------------------------------------------------------------------
+# Inputs consumed by src/utils/generate_psm_cohort.py to produce a matched
+# cohort CSV that downstream training tasks (e.g. copd_classification_charite_psm)
+# reference via their metadata_file. Controls are the rare group in Charité, so
+# the matching infrastructure runs with labels swapped internally; this config
+# describes the problem in its natural (COPD=treated, control=candidate) framing.
+# ============================================================================
+psm_matching:
+  charite:
+    k: 5                                      # 1:K matching ratio (K-sweep: scripts/reconstruct_psm_artifacts.py)
+    caliper_coef: 0.20                        # caliper = coef × local SD(logit-PS)
+    age_caliper_years: 10                     # absolute-age prune before PS k-NN (Charité: narrower clinical band than UK)
+    exact_match: [ sex ]                      # exact strata for matching (all Charité German → no language key)
+    # Age-only propensity model (linear age, no age²). At 22 controls a
+    # multi-covariate PS would be fitted on too few events per variable, so the
+    # comorbidity covariates are left out of the PS; with one covariate + exact
+    # sex this is effectively exact-sex + age-caliper matching. The quadratic age
+    # term changes which cases match at this N; linear age reproduces the
+    # published cohort (N = 55; scripts/reconstruct_psm_artifacts.py).
+    propensity_covariates: []
+    use_age: true
+    age_squared: false                        # linear age only (no age²)
+    # Reported in the balance table only (NOT used by the PS model) to show what
+    # age-only matching does/does not achieve on available pre-COPD confounders.
+    # Cardiovascular/renal are absent from comorbidities.csv by design
+    # (perfect-separation, 0% in controls); their structural imbalance is
+    # sourced from the demographics table + recruitment design, not from here.
+    report_covariates: [ breathing, metabolic, depression, hypothyreose ]
+    reference_year: 2025                      # age = reference_year − birth_year
+    random_seed: 42
+
+# Scope definitions: incremental view (overrides demographic_feature_columns + include_voice_features from training block)
+#
+# Sentinel `from_ps_covariates` is resolved at config-generation time in
+# generate_experiment_configs.py and expands to [age, sex, <ps_covariate
+# columns from the task's ps_covariates_file>]. This keeps the demographics
+# baseline symmetric with the PS-overlap weighting covariates (Charité: 4
+# pre-COPD comorbidity clusters; UK: 12 individual comorbidity indicators).
+scopes:
+  age_only:
+    # Strongest single demographic predictor in the Charite cohort (age is
+    # the only individually informative covariate; sex and the comorbidity
+    # flags are at chance or anti-directional). Used as the most conservative
+    # demographic comparator for the confound-critical reading: the voice
+    # uplift over the strongest single demographic predictor, measured under
+    # the identical Tier-1 seed-sweep protocol as the other baselines.
+    demographic_feature_columns: [ age ]
+    include_voice_features: false
+  age_sex_only:
+    # Demographics baseline WITHOUT any comorbidity information. Used to
+    # quantify how much of the apparent "voice uplift" is in fact explained
+    # by comorbidity confounding when comorbidities are excluded from the
+    # baseline. Together with age_sex_comorbidity (count_bin) and
+    # age_sex_comorbidity_individual (per-flag), this gives a progressive
+    # demographic-detail series for confounder-attribution analysis.
+    demographic_feature_columns: [ age, sex ]
+    include_voice_features: false
+  age_sex_comorbidity:
+    demographic_feature_columns: [ age, sex, comorbidity_count_bin ]
+    include_voice_features: false
+  age_sex_comorbidity_individual:
+    demographic_feature_columns: from_ps_covariates
+    include_voice_features: false
+  voice_only:
+    demographic_feature_columns: []
+    include_voice_features: true
+  voice_plus_age_sex_comorbidity:
+    demographic_feature_columns: [ age, sex, comorbidity_count_bin ]
+    include_voice_features: true
+  voice_plus_age_sex_comorbidity_individual:
+    demographic_feature_columns: from_ps_covariates
+    include_voice_features: true
+
+# Available ML algorithms
+classifiers:
+  available: [ "RandomForestClassifier", "SVC", "LogisticRegression", "XGBClassifier" ]
+
+# Training configurations
+# sample_weight_strategy: class_only | ps_overlap (default, PS simplified + ESS) | overlap_ps_and_deploy | strata_only.
+# Demographic/voice: demographic_feature_columns + include_voice_features (e.g. ["age","sex","bmi","comorbidity_count_bin"], true).
+training:
+  # Basic training - fast debugging
+  basic:
+    random_seed: 42
+    n_splits_outer: 5
+    n_repeats_outer: 5 # Single repeat for speed
+    n_splits_inner: 5
+    n_repeats_inner: 3 # Single repeat for speed
+    scoring_metric: "auroc"
+    n_jobs: -1
+    lr_max_iter: 1000
+    sample_weight_strategy: "ps_overlap"
+
+  # Extended training - thorough evaluation
+  extended:
+    random_seed: 42
+    n_splits_outer: 5
+    n_repeats_outer: 10 # Full repeats
+    n_splits_inner: 5
+    n_repeats_inner: 3 # Full repeats
+    scoring_metric: "auroc"
+    n_jobs: -1
+    lr_max_iter: 1000
+    sample_weight_strategy: "ps_overlap"
+
+  # Seed-sweep robust-baseline + voice-unweighted sensitivity (Phase II).
+  # Same outer/inner CV as `extended` so individual seed-level numbers are
+  # directly comparable to the main results; sample_weight_strategy is
+  # overridden per-tuple by the seed-sweep matrix (`ps_overlap` vs
+  # `class_only`), and random_seed is overridden per-iteration in
+  # src/train_seed_sweep.py.
+  seed_sweep:
+    random_seed: 1  # placeholder, overridden by sweep loop
+    n_splits_outer: 5
+    n_repeats_outer: 10
+    n_splits_inner: 5
+    n_repeats_inner: 3
+    scoring_metric: "auroc"
+    n_jobs: -1
+    lr_max_iter: 1000
+    sample_weight_strategy: "ps_overlap"  # placeholder, overridden per tuple
+
+# HYPERPARAMETER SEARCH SPACES (for train.py)
+clf_hyperparameters:
+  # Basic hyperparameter grid - faster experiments
+  basic:
+    RandomForestClassifier:
+      clf__n_estimators: [ 100 ]
+      clf__max_depth: [ 5, 10 ]
+      clf__max_features: [ "sqrt" ]
+      clf__min_samples_leaf: [ 2, 4 ]
+
+  # Extended hyperparameter grid - thorough search
+  extended:
+    RandomForestClassifier:
+      clf__n_estimators: [ 100, 200, 500 ]
+      clf__max_depth: [ 5, 10, 25 ]
+      clf__max_features: [ "sqrt", "log2" ]
+      clf__min_samples_leaf: [ 2, 4 ]
+    SVC:
+      clf__C: [ 0.1, 1.0, 10.0 ]
+      clf__gamma: [ "scale", "auto" ]
+      clf__kernel: [ "linear", "rbf" ]
+    LogisticRegression:
+      clf__C: [ 0.01, 0.1, 0.5 ]
+      clf__penalty: [ "l1", "l2" ]
+      clf__solver: [ "saga" ]
+    XGBClassifier:
+      clf__n_estimators: [ 100, 200, 500 ]
+      clf__max_depth: [ 3, 6, 9 ]
+      clf__learning_rate: [ 0.01, 0.1, 0.2 ]
+
+  # LR-only baseline grid for the seed-sweep sensitivity (Phase II).
+  # Rationale: a demographics-only baseline of N ~ 65 (PSM) with 4-6
+  # binary/continuous covariates is below EPV thresholds for tree ensembles
+  # and kernel SVMs; pilot runs with RF/SVC showed sign-flipped fits
+  # (mean fold AUROC ~0.28 = inverted prediction direction). Logistic
+  # regression with L2 penalty + class balancing is the standard
+  # epidemiological adjusted risk model and is well-behaved at low EPV.
+  # We do *not* sweep `penalty` or `solver` here: a single, fixed model
+  # class with C selected via inner CV is what makes the baseline
+  # "one robust number" rather than "best of N classifiers".
+  lr_baseline:
+    LogisticRegression:
+      clf__C: [ 0.01, 0.1, 1.0, 10.0 ]
+      clf__penalty: [ l2 ]
+      clf__solver: [ lbfgs ]
+
+# PCA HYPERPARAMETER SEARCH SPACES
+pca_hyperparameters:
+  # Basic PCA grid
+  basic:
+    PCA__wav2vec_n_components: [ 15, 30 ]
+    PCA__parsel_n_components: [ 20, 50 ]
+
+  # Extended PCA grid
+  extended:
+    PCA__wav2vec_n_components: [ 15, 30, 50 ]
+    PCA__parsel_n_components: [ 10, 20, 50 ]
+
+  # Baseline LR uses a fixed/minimal PCA configuration. With <= 6 demographic
+  # features, PCA passes through anyway (see W2VParselPCA.fit), so the
+  # values are inert placeholders to keep the param-grid shape compatible
+  # with the rest of the pipeline.
+  lr_baseline:
+    PCA__wav2vec_n_components: [ 15 ]
+    PCA__parsel_n_components: [ 10 ]
+
+# Task configurations
+tasks:
+  copd_classification:
+    target_column: "lung_disease_main"
+    target_classes: [ "copd", "control" ]
+    exclude_longitudinal: true
+    only_longitudinal: false
+    use_temporal_pairs: false
+    included_data_sources: [ "charite", "uk_covid" ] # Include all data sources by default
+
+  # Example: Charite-only COPD classification
+  copd_classification_charite_only:
+    target_column: "lung_disease_main"
+    target_classes: [ "copd", "control" ]
+    exclude_longitudinal: true
+    only_longitudinal: false
+    use_temporal_pairs: false
+    included_data_sources: [ "charite" ] # Only Charite data
+
+  # Charite-only, restricted to participants with ALL 4 recording categories (a, i, o, poem).
+  # This ensures identical participant sets across all recording types, enabling fully paired
+  # comparisons (same CV splits).
+  copd_classification_charite_complete:
+    target_column: "lung_disease_main"
+    target_classes: [ "copd", "control" ]
+    exclude_longitudinal: true
+    only_longitudinal: false
+    use_temporal_pairs: false
+    included_data_sources: [ "charite" ]
+    require_all_recording_categories: [ "a", "i", "o", "poem" ]
+
+  # Charité-only, propensity-score-matched cohort. Produced by the
+  # ``match_charite_psm`` Snakemake rule from psm_matching.charite config.
+  # The matched cohort is small (~45 persons), so nested CV uses reduced
+  # fold counts; this is still defensible for a balanced-by-design primary.
+  copd_classification_charite_psm:
+    target_column: "lung_disease_main"
+    target_classes: [ "copd", "control" ]
+    exclude_longitudinal: true
+    only_longitudinal: false
+    use_temporal_pairs: false
+    included_data_sources: [ "charite" ]
+    require_all_recording_categories: [ "a", "i", "o", "poem" ]
+    # Overrides the default preprocessed metadata with the PSM-matched file
+    # emitted by rule match_charite_psm. Cluster-absolute path with {date}
+    # substitution (mirrors the UK pattern).
+    metadata_file: "/data/cephfs-1/work/groups/mittermaier/stimmaufnahmen/{date}/psm_matched_charite.csv"
+
+  # UK COVID-only COPD classification (uses PSM-matched metadata)
+  copd_classification_uk_only:
+    target_column: "lung_disease_main"
+    target_classes: [ "copd", "control" ]
+    exclude_longitudinal: true
+    only_longitudinal: false
+    use_temporal_pairs: false
+    included_data_sources: [ "uk_covid" ]
+    # Task-specific PS covariates (individual UK comorbidities from matching script).
+    # Overrides the global ps_covariates_file (which points to Charité comorbidities).
+    ps_covariates_file: "/data/cephfs-1/work/groups/mittermaier/stimmaufnahmen/{date}/uk_matched_metadata_ps_covariates.csv"
