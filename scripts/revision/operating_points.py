@@ -7,6 +7,8 @@ specificity 0.80 and 0.90 and specificity at sensitivity 0.80 and 0.90, with a
 class-stratified participant bootstrap (B = 5000).
 
 Usage: uv run python scripts/revision/operating_points.py <run_dir> [<run_dir> ...]
+       uv run python scripts/revision/operating_points.py arms.json
+       (arms.json as for paired_bootstrap.py; results are keyed by arm label)
 """
 import glob
 import json
@@ -55,7 +57,11 @@ def points(y, p, w):
 
 def main():
     res = {}
-    for run_dir in sys.argv[1:]:
+    if len(sys.argv) == 2 and sys.argv[1].endswith(".json"):
+        targets = json.load(open(sys.argv[1]))["arms"]
+    else:
+        targets = {d: d for d in sys.argv[1:]}
+    for label, run_dir in targets.items():
         y, p, w = load(run_dir)
         est = points(y, p, w)
         pos, neg = np.where(y == 1)[0], np.where(y == 0)[0]
@@ -64,7 +70,7 @@ def main():
             idx = np.r_[RNG.choice(pos, len(pos)), RNG.choice(neg, len(neg))]
             for k, v in points(y[idx], p[idx], w[idx]).items():
                 draws[k].append(v)
-        res[run_dir] = {"n_copd": int(len(pos)), "n_control": int(len(neg)),
+        res[label] = {"n_copd": int(len(pos)), "n_control": int(len(neg)),
                         **{k: [round(est[k], 3), round(float(np.percentile(draws[k], 2.5)), 3),
                                round(float(np.percentile(draws[k], 97.5)), 3)] for k in est}}
     print(json.dumps(res, indent=1))

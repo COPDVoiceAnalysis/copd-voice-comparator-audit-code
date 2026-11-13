@@ -494,13 +494,37 @@ def main():
             "cross-cohort validation as the primary analysis."
         ),
     )
+    parser.add_argument(
+        "--features_base", default=None, type=Path,
+        help=(
+            "Directory holding preprocessed__<preproc>/, wav2vec2__<preproc>/ and "
+            "parselmouth__<preproc>/. Default: ~/work/pipeline_features/<date>, "
+            "the layout of the published run."
+        ),
+    )
+    parser.add_argument(
+        "--raw_dir", default=None, type=Path,
+        help=(
+            "Directory holding comorbidities.csv and "
+            "uk_matched_metadata_ps_covariates.csv. Default: the cluster group "
+            "directory of the published run."
+        ),
+    )
+    parser.add_argument(
+        "--uk_languages", nargs="+", default=None,
+        help=(
+            "Keep only UK participants whose metadata 'language' is in this list "
+            "(e.g. 'de' for the same-language subset of Reviewer 1, point 5). "
+            "Charité rows are untouched. Default: all UK participants."
+        ),
+    )
     args = parser.parse_args()
 
     setup_application_logging(logging.INFO)
 
     home = Path.home()
-    scratch_base = SCRATCH_TPL.format(home=home, date=args.date)
-    raw_dir = RAW_DIR_TPL.format(date=args.date)
+    scratch_base = str(args.features_base or SCRATCH_TPL.format(home=home, date=args.date))
+    raw_dir = str(args.raw_dir or RAW_DIR_TPL.format(date=args.date))
 
     metadata_csv = Path(scratch_base) / f"preprocessed__{args.preproc}" / "metadata.csv"
     # Charité metadata may be overridden (e.g. PSM-matched cohort). The UK
@@ -516,6 +540,22 @@ def main():
 
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
+
+    uk_metadata_csv = metadata_csv
+    if args.uk_languages:
+        import pandas as pd
+
+        meta = pd.read_csv(metadata_csv)
+        is_uk = meta["data_source"] == "uk_covid"
+        keep = ~is_uk | meta["language"].isin(args.uk_languages)
+        uk_metadata_csv = output_dir / "uk_metadata_language_subset.csv"
+        meta[keep].to_csv(uk_metadata_csv, index=False)
+        logger.info(
+            "UK restricted to languages %s: %d of %d UK participants kept",
+            args.uk_languages,
+            meta.loc[is_uk & keep, "audio_id"].nunique(),
+            meta.loc[is_uk, "audio_id"].nunique(),
+        )
 
     all_results = []
 
@@ -540,7 +580,7 @@ def main():
             task_dict=UK_TASK,
             splitting=splitting,
             feature_config=feature_config,
-            metadata_csv=metadata_csv,
+            metadata_csv=uk_metadata_csv,
             ps_covariates_file=ps_covariates_uk,
         )
 
@@ -578,6 +618,7 @@ def main():
         "charite_cohort_variant": (
             "psm_matched" if args.charite_metadata_csv else "full"
         ),
+        "uk_languages": args.uk_languages,
         "results": all_results,
     }
     results_file = output_dir / "cross_dataset_results.json"

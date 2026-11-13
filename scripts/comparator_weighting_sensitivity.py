@@ -54,6 +54,7 @@ SEEDS = [42, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 UK_METADATA = OUT / "uk_metadata_902.csv"
 UK_VOICE = ("data/2025-08-13/mlflow_cluster/271009020022062271/"
             "de720542f5974ee8998d966ca75a536f/artifacts/fold_predictions/*.parquet")
+PREPROC = "norm_on"
 UK_COMORB = ["angina", "asthma", "cancer", "diabetes", "hbp", "heart", "hiv",
              "longterm", "organ", "otherheart", "stroke", "valvular"]
 
@@ -119,8 +120,8 @@ def make_config(cohort, scope, grid, weighting):
         "experiment_version": "comparator_weighting",
         "feature_config": {
             "demographics_only": True,
-            "embeddings_dir": "data/2025-08-13/wav2vec2__norm_on",
-            "parsel_feature_file": "data/2025-08-13/parselmouth__norm_on/acoustic_features.npy",
+            "embeddings_dir": f"data/2025-08-13/wav2vec2__{PREPROC}",
+            "parsel_feature_file": f"data/2025-08-13/parselmouth__{PREPROC}/acoustic_features.npy",
             "parselmouth_config": {
                 "exact_feature_list": None,
                 "include_advanced_voice_quality": False,
@@ -175,7 +176,10 @@ def make_config(cohort, scope, grid, weighting):
 
 def write_uk_metadata():
     """UK cohort of the published comparator runs: the 902 voice_uk participants."""
-    ids = pd.concat([pd.read_parquet(f) for f in glob.glob(UK_VOICE)])["audio_id"].unique()
+    files = glob.glob(UK_VOICE)
+    if not files:
+        raise FileNotFoundError(f"No UK voice fold predictions match {UK_VOICE}")
+    ids = pd.concat([pd.read_parquet(f) for f in files])["audio_id"].unique()
     meta = pd.read_csv("data/uk_matched_metadata.csv")
     meta[meta["audio_id"].isin(ids)].to_csv(UK_METADATA, index=False)
 
@@ -193,6 +197,17 @@ def run(cid, cfg_path, seeds):
     return rc
 
 
+def set_paths(out, uk_voice_glob, preproc="norm_on"):
+    """Point the module-level paths at `out` and `preproc` (defaults: unchanged)."""
+    global OUT, UK_METADATA, UK_VOICE, PREPROC
+    OUT = Path(out)
+    UK_METADATA = OUT / "uk_metadata_902.csv"
+    UK_VOICE = uk_voice_glob
+    PREPROC = preproc
+    COHORTS["uk"]["metadata_file"] = str(UK_METADATA)
+    COHORTS["charite"]["metadata_file"] = f"data/2025-08-13/preprocessed__{preproc}/metadata.csv"
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--cohort", choices=list(COHORTS), default="charite")
@@ -201,7 +216,17 @@ def main():
     ap.add_argument("--weightings", nargs="+", default=WEIGHTINGS)
     ap.add_argument("--seeds", nargs="+", type=int, default=SEEDS)
     ap.add_argument("--workers", type=int, default=8)
+    ap.add_argument("--out", type=Path, default=OUT,
+                    help="Output directory (configs/, runs/, mlruns/). "
+                         "Default: outputs/comparator_weighting")
+    ap.add_argument("--uk-voice-glob", default=UK_VOICE,
+                    help="Glob of the UK voice run's fold_predictions parquet files; "
+                         "its participants define the UK comparator cohort. "
+                         "Default: the published voice_uk run in the local mirror")
+    ap.add_argument("--preproc", default="norm_on",
+                    help="Feature/metadata variant under data/2025-08-13 (default norm_on, as published)")
     a = ap.parse_args()
+    set_paths(a.out, a.uk_voice_glob, a.preproc)
     c = COHORTS[a.cohort]
 
     (OUT / "configs").mkdir(parents=True, exist_ok=True)
