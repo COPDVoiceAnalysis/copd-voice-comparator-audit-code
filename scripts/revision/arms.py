@@ -53,6 +53,10 @@ VOICE_SCOPES = {
     "voice+age+sex": "voice_plus_age_sex",
     "voice+age+sex+comorb": "voice_plus_age_sex_comorbidity_individual",
 }
+# voice_plus_age_sex has no entry under `scopes:` in config/pipeline_config.yml,
+# so the generator would fall back to the training default [age, sex, bmi].
+# The revision arm is voice + age + sex only, as its name says.
+SCOPE_COLUMNS = {"voice_plus_age_sex": ["age", "sex"]}
 # label -> (scope, weighting) of the comparator runs, per cohort
 COMPARATORS = {
     "charite": {"age": "age_only", "age+sex": "age_sex_only", "age+sex+comorb": "age_sex_comorbidity_individual"},
@@ -113,6 +117,10 @@ def make_configs(a):
                                       c["classifier"], c["splitting"])
             if not gen.generate_single_config(params, dirs(path)):
                 raise RuntimeError(f"Generator skipped {cid}")
+            if scope in SCOPE_COLUMNS:
+                cfg = yaml.safe_load(open(path))
+                cfg["training_config"]["demographic_feature_columns"] = SCOPE_COLUMNS[scope]
+                path.write_text(yaml.safe_dump(cfg, sort_keys=False))
             written.append(path)
     if a.layers:
         template = yaml.safe_load(open(out / f"{voice_id(a.preproc, 'charite', 'voice_only')}__config.yml"))

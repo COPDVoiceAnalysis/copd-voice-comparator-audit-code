@@ -53,11 +53,22 @@ def main():
     ap.add_argument("--audio-dir", action="append", default=[],
                     help="Fallback directory searched by file name when a metadata path does not exist "
                          "(repeatable; e.g. the raw data directory)")
+    ap.add_argument("--rate-metadata", action="append", default=[],
+                    help="Further metadata CSV(s) with recording_identifier and sampling_rate; used to fill "
+                         "sample rates missing in --metadata (e.g. the preprocessed metadata, which carries "
+                         "the COVID-19 Sounds source rate)")
     ap.add_argument("--category", default="poem")
     ap.add_argument("--out", required=True)
     a = ap.parse_args()
 
     meta = pd.read_csv(a.metadata, low_memory=False)
+    if "sampling_rate" not in meta.columns:
+        meta["sampling_rate"] = np.nan
+    for extra in a.rate_metadata:
+        e = pd.read_csv(extra, usecols=lambda c: c in {"recording_identifier", "sampling_rate"}, low_memory=False)
+        if {"recording_identifier", "sampling_rate"} <= set(e.columns):
+            rate = e.dropna().drop_duplicates("recording_identifier").set_index("recording_identifier").sampling_rate
+            meta["sampling_rate"] = meta.sampling_rate.fillna(meta.recording_identifier.map(rate))
     rows = []
     for spec in a.cohort:
         source, run = spec.split("=", 1)
@@ -72,7 +83,7 @@ def main():
         info = [header(p) if p else (np.nan,) * 3
                 for p in (resolve(p, a.audio_dir) for p in m.audio_sample_path)]
         m["hdr_sr"], m["channels"], m["duration_s"] = zip(*info) if info else ([], [], [])
-        meta_sr = m["sampling_rate"] if "sampling_rate" in m.columns else pd.Series(np.nan, index=m.index)
+        meta_sr = m["sampling_rate"]
         m["sample_rate_hz"] = meta_sr.fillna(m["hdr_sr"])
         m["source"] = np.where(meta_sr.notna(), "metadata", np.where(m.hdr_sr.notna(), "header", "unknown"))
         m["class"] = m.audio_id.map(ids).map({1: "copd", 0: "control"})

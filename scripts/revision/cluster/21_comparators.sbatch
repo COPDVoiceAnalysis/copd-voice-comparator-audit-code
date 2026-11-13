@@ -19,4 +19,16 @@ if [ "$COHORT" = uk ]; then
 fi
 log "comparators $COHORT"
 py scripts/comparator_weighting_sensitivity.py "${ARGS[@]}"
+# A run whose folds all fail is still marked FINISHED by MLflow, without fold
+# predictions; treat that as a failure here so it is not missed.
+py - "$OUT/comparators/mlruns" "$COHORT" <<'PY'
+import sys
+from pathlib import Path
+task = {"charite": "charite_complete", "uk": "uk_only"}[sys.argv[2]]
+bad = [n.read_text().strip() for n in Path(sys.argv[1]).glob("*/*/tags/mlflow.runName")
+       if task in n.read_text() and not list((n.parent.parent / "artifacts" / "fold_predictions").glob("*.parquet"))]
+if bad:
+    sys.exit("comparator runs without fold predictions (see $OUT/comparators/runs/*.log):\n  " + "\n  ".join(bad))
+print("all comparator runs have fold predictions")
+PY
 log "done"

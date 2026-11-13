@@ -41,6 +41,7 @@ The within-cohort and cross-cohort experiments ran on a SLURM cluster through Sn
 | Age–score correlation among controls (§4.3) | `scripts/compute_age_score_correlation.py` |
 | Design-factor decomposition, linear mixed model (Table S3) | `notebooks/lung_disease_runs_analysis.py`, `notebooks/lung_disease_runs_analysis_psm.py`, `scripts/lmm_logit_sensitivity.py` |
 | COVID-19 Sounds configuration grid | `notebooks/uk_results_analysis.py` |
+| Revision analyses (reviewer responses: incremental value, operating points, comparator mechanism and simulation, demographic decoding, same-language transfer, sample rates, layer sweep) and the cluster runbook | `scripts/revision/` (see `scripts/revision/README.md`) |
 | Figures 1–3 | `scripts/paper_fig1_participant_flow.py`, `scripts/paper_fig2_voice_vs_baseline.py`, `scripts/copdvd_sim_figure.py`, shared style in `scripts/paper_fig_style.py` |
 
 The notebooks are [marimo](https://marimo.io) notebooks (`uv run marimo edit <file>`), except `uk_metadata.ipynb` (Jupyter, outputs removed). Scripts are run from the repository root, e.g.

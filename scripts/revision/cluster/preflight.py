@@ -86,10 +86,12 @@ def main():
                             capture_output=True, text=True).stdout.strip()
     commit = subprocess.run(["git", "-C", str(repo), "rev-parse", "--short", "HEAD"],
                             capture_output=True, text=True).stdout.strip()
-    dirty = subprocess.run(["git", "-C", str(repo), "status", "--porcelain", "--untracked-files=no"],
-                           capture_output=True, text=True).stdout.strip()
+    dirty = "\n".join(line for line in subprocess.run(
+        ["git", "-C", str(repo), "status", "--porcelain", "--untracked-files=no"],
+        capture_output=True, text=True).stdout.splitlines() if not line.endswith("revision.env"))
     say("OK" if branch == "revision-sensors-r1" else "WARN", f"repo branch {branch} at {commit}")
-    say("OK" if not dirty else "WARN", "tracked files unchanged" if not dirty else f"tracked files modified:\n{dirty}")
+    say("OK" if not dirty else "WARN", "tracked files unchanged (revision.env may differ)" if not dirty
+        else f"tracked files modified besides revision.env:\n{dirty}")
 
     # --- raw / group directory -------------------------------------------
     need = ["merged_metadata.csv", "comorbidities.csv", "psm_matched_charite.csv",
@@ -131,6 +133,15 @@ def main():
     (OUT / "state" / "features_base").write_text(str(base))
     (OUT / "state" / "features_need_build").write_text("1" if base == NEW_FEAT and not ok_new else "0")
     say("INFO", f"VERDICT features: {base} ({why})")
+    meta_csv = base / f"preprocessed__{PREPROC}" / "metadata.csv"
+    if readable(meta_csv) and readable(RAW / "uk_matched_metadata.csv"):
+        pm = pd.read_csv(meta_csv, low_memory=False)
+        uk_ids = set(pd.read_csv(RAW / "uk_matched_metadata.csv").audio_id)
+        feat_ids = set(pm[pm.data_source == "uk_covid"].audio_id)
+        share = len(uk_ids & feat_ids) / max(len(uk_ids), 1)
+        say("OK" if share > 0.95 else "FAIL",
+            f"chosen features cover {share:.0%} of the uk_matched_metadata participants "
+            "(features and metadata must come from the same snapshot)")
 
     # --- published runs --------------------------------------------------
     found = 0
@@ -138,9 +149,10 @@ def main():
         ok = bool(published_files(OLD_MLFLOW, label))
         found += ok
         say("OK" if ok else "INFO", f"published run {label}: {'readable' if ok else 'not readable'}")
-    (OUT / "state" / "published_available").write_text("1" if found == len(PUBLISHED) else "0")
+    (OUT / "state" / "published_available").write_text("1" if found else "0")
     say("INFO", f"VERDICT published runs: {found} of {len(PUBLISHED)} readable"
-        + ("" if found == len(PUBLISHED) else " (export step will be skipped)"))
+        + (" (the 'paper numbers' step will be skipped)" if not found else
+           "" if found == len(PUBLISHED) else " (the 'paper numbers' step uses the readable cohort only)"))
 
     # --- space and model cache ------------------------------------------
     free_gb = shutil.disk_usage(OUT).free / 1e9

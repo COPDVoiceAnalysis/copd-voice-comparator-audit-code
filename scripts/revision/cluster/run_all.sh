@@ -43,10 +43,10 @@ sub() {
     echo "local"
     return
   fi
-  local id
-  # shellcheck disable=SC2086
+  local id script=$1; shift
+  # shellcheck disable=SC2086  # $extra holds several sbatch options
   id=$(sbatch --parsable --export=ALL --job-name="rev-$name" \
-       --output="$OUT/logs/%x-%A_%a.out" ${dep:+--dependency=$dep} $extra "$HERE/$@")
+       --output="$OUT/logs/%x-%A_%a.out" ${dep:+--dependency=$dep} $extra "$HERE/$script" "$@")
   echo "$name $id" >> "$JOBS"
   echo "$id"
 }

@@ -1,8 +1,10 @@
+# shellcheck shell=bash
 # Sourced by every stage script. Not meant to be run directly.
 set -euo pipefail
 HERE="${REV_HERE:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}"
 export REV_HERE="$HERE"
-export REPO="$(cd "$HERE/../../.." && pwd)"
+REPO="$(cd "$HERE/../../.." && pwd)"
+export REPO
 # shellcheck source=revision.env
 source "$HERE/revision.env"
 cd "$REPO"

@@ -45,7 +45,8 @@ VU=$(armrun "$ARMS/uk.json" voice 2>/dev/null)
 
 COH=(); [ -n "$VC" ] && COH+=(--cohort "charite=$VC"); [ -n "$VU" ] && COH+=(--cohort "uk_covid=$VU")
 [ ${#COH[@]} -gt 0 ] && step recording_summary py scripts/revision/recording_summary.py \
-  --metadata "$RAW_DIR/merged_metadata.csv" --audio-dir "$RAW_DIR" "${COH[@]}" --out "$A/recording_summary.csv"
+  --metadata "$RAW_DIR/merged_metadata.csv" --audio-dir "$RAW_DIR" \
+  --rate-metadata "data/$DATE/preprocessed__$PREPROC/metadata.csv" "${COH[@]}" --out "$A/recording_summary.csv"
 
 XDS=("$OUT"/crossdataset/*/cross_dataset_results.json)
 [ -e "${XDS[0]}" ] && step crossdataset py scripts/revision/summarize_crossdataset.py "$A/crossdataset_summary.csv" "${XDS[@]}"
