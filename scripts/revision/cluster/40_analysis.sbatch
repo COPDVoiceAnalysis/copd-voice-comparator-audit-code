@@ -25,6 +25,8 @@ armrun() { py -c "import json,sys; print(json.load(open(sys.argv[1]))['arms'][sy
 
 step resolve py scripts/revision/arms.py resolve --preproc "$PREPROC" --mlruns "$OUT/mlruns" \
   --comparator-mlruns "$OUT/comparators/mlruns" --out-dir "$ARMS"
+# runs the analysis expected but did not find (failed or not finished)
+[ -s "$ARMS/missing.txt" ] && sed 's/^/MISSING /' "$ARMS/missing.txt" >> "$A/STATUS.txt"
 
 for c in charite uk; do
   [ -f "$ARMS/$c.json" ] || { echo "FAIL  $c (no arm file)" >> "$A/STATUS.txt"; continue; }

@@ -19,7 +19,7 @@ bash scripts/revision/cluster/00_preflight.sh          # read-only check, ~1 min
 bash scripts/revision/cluster/01_setup.sh              # env + data links, login node
 bash scripts/revision/cluster/run_all.sh               # submits all Slurm jobs
 # ... wait until `squeue --me` is empty, then:
-cat ~/work/revision_sensors_r1/analysis/STATUS.txt     # every line should say OK
+cat ~/work/revision_sensors_r1/analysis/STATUS.txt     # every line should say OK (MISSING = a run that did not finish)
 bash scripts/revision/cluster/50_collect.sh            # copies aggregate results into the repo
 git add results/revision_r1 && git commit -m "revision: cluster results" && git push
 ```
@@ -58,6 +58,11 @@ whole poem, logistic regression), same nested person-aware CV (5 outer splits ×
 10 repeats, inner 5 × 3), same seed 42, same `ps_overlap` training weights and
 strata-weighted evaluation. **Do not change seeds, grids, CV sizes or
 weightings**: the point of the reruns is that they match the paper.
+
+One deliberate difference: the scope `voice_plus_age_sex` has no entry in
+`config/pipeline_config.yml` and would fall back to the training default
+(age, sex, BMI); `arms.py` sets it to age and sex only, matching the age+sex
+comparator it is compared with.
 
 The model runs ("arms") are defined in one place, `arms.py`; the MLflow run
 name of each arm is its config file name, so every result can be traced to its
@@ -161,6 +166,8 @@ Common problems:
 |---|---|---|
 | preflight `FAIL raw input ...` | `RAW_DIR` wrong or not readable | fix `RAW_DIR`; check group membership (`id`) |
 | `BUILD NEEDED` although the old features exist | old account's files not readable for you | ask for read access, or let the build run (results are equivalent; the published `norm_on` pipeline is deterministic up to library versions, which `uv.lock` pins) |
+| preflight `FAIL chosen features cover NN% of the uk_matched_metadata participants` | features and `uk_matched_metadata.csv` come from different data snapshots | use the feature directory built from this `RAW_DIR` (rebuild if needed); do not mix snapshots |
+| `rev-comparators-*` ends with "comparator runs without fold predictions" | every CV fold of a comparator failed (often: one class only, i.e. a cohort mismatch) | read `$OUT/comparators/runs/<name>.log`; usually the same snapshot problem as above |
 | `rev-wav2vec` fails with no GPU / CUDA | GPU partition or gres wrong | fix `SBATCH_GPU_ARGS` |
 | `rev-wav2vec` tries to download the model | `HF_HOME` differs between login and compute node | keep `HF_HOME` on shared storage and rerun `01_setup.sh` |
 | `rev-comparators-uk` "UK voice run ... not finished" | the UK voice training failed | read its log in `$OUT/logs/rev-train-*`, fix, resubmit `--only train,comparators,analysis` |

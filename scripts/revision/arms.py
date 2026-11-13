@@ -194,6 +194,7 @@ def resolve(a):
         json.dump({"arms": layers, "contrasts": [[k, "layer04"] for k in layers if k != "layer04" and "layer04" in layers]},
                   open(out / "layers.json", "w"), indent=1)
     print(f"arm files in {out}; {len(layers)} layer runs found")
+    (out / "missing.txt").write_text("".join(f"{m}\n" for m in missing))
     if missing:
         print("MISSING runs (not finished or not found):\n  " + "\n  ".join(missing))
         if a.strict:

@@ -9,3 +9,6 @@ __pycache__/
 *.pyc
 .ipynb_checkpoints/
 .DS_Store
+
+# smoke-test outputs of the revision runbook are never committed
+results/*_SMOKE/
