@@ -1,0 +1,39 @@
+[INFO] DATE=2025-08-13 PREPROC=norm_on OUT=$OUT
+[OK  ] command available: uv
+[OK  ] command available: git
+[OK  ] command available: sbatch
+[OK  ] repo branch revision-sensors-r1 at b4a12b8
+[WARN] tracked files modified besides revision.env:
+ M scripts/revision/cluster/10_features_preprocess.sbatch
+ M scripts/revision/cluster/40_analysis.sbatch
+[OK  ] raw input /data/cephfs-1/work/groups/mittermaier/stimmaufnahmen/2025-08-13/merged_metadata.csv
+[OK  ] raw input /data/cephfs-1/work/groups/mittermaier/stimmaufnahmen/2025-08-13/comorbidities.csv
+[OK  ] raw input /data/cephfs-1/work/groups/mittermaier/stimmaufnahmen/2025-08-13/psm_matched_charite.csv
+[OK  ] raw input /data/cephfs-1/work/groups/mittermaier/stimmaufnahmen/2025-08-13/uk_matched_metadata.csv
+[OK  ] raw input /data/cephfs-1/work/groups/mittermaier/stimmaufnahmen/2025-08-13/uk_matched_metadata_ps_covariates.csv
+[INFO] merged_metadata: 225 charite participants
+[INFO] merged_metadata: 902 uk_covid participants
+[WARN] raw audio: 13 of 20 sampled recordings found (needed only to build features and for the sample-rate table)
+[INFO] uk_matched_metadata: 906 participants
+[INFO] UK participants by language and class:
+lung_disease_main  control  copd
+language                        
+de                     104    14
+el                       3     1
+en                     219    27
+es                      88    11
+it                      62     8
+pt                     307    35
+ru                      23     4
+[INFO] published features: missing or unreadable: <home>/work/pipeline_features/2025-08-13/preprocessed__norm_on/metadata.csv
+[INFO] own features: missing or unreadable: $OUT_features/2025-08-13/preprocessed__norm_on/metadata.csv
+[INFO] VERDICT features: $OUT_features/2025-08-13 (BUILD NEEDED (run with features stage))
+[INFO] published run charite_voice: not readable
+[INFO] published run charite_age+sex (weighted): not readable
+[INFO] published run charite_age+sex+comorb (weighted): not readable
+[INFO] published run uk_voice: not readable
+[INFO] published run uk_age+sex (weighted): not readable
+[INFO] published run uk_age+sex+comorb (weighted): not readable
+[INFO] VERDICT published runs: 0 of 6 readable (the 'paper numbers' step will be skipped)
+[OK  ] 583577 GB free under $OUT (feature build needs ~50 GB)
+[INFO] wav2vec2-large-robust in <home>/work/.cache/huggingface: not cached (01_setup.sh downloads it when features must be built)

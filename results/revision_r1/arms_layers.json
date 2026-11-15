@@ -1,0 +1,127 @@
+{
+ "arms": {
+  "layer00": "$OUT/mlruns/566826726846867956/fd9ee874614d4a8fa3359f5b5c8462e4",
+  "layer01": "$OUT/mlruns/566826726846867956/201ca4b5ea0c4f608c28da0b91c18783",
+  "layer02": "$OUT/mlruns/566826726846867956/d749d71d00054abc845a0d0d67b6062e",
+  "layer03": "$OUT/mlruns/566826726846867956/83b085eed9bd4c7fbda95d8dd72ff768",
+  "layer04": "$OUT/mlruns/566826726846867956/b6a546c2657f495fa729c8735f57ce0b",
+  "layer05": "$OUT/mlruns/566826726846867956/6a3cd1e34050438b9f89ab21e3e914fc",
+  "layer06": "$OUT/mlruns/566826726846867956/1704171444014672b38e5e5b3faedb21",
+  "layer07": "$OUT/mlruns/566826726846867956/7845f1a1d25b4fc9aeece6ce0f7302b2",
+  "layer08": "$OUT/mlruns/566826726846867956/8323b3bf5b93421aa58cc4399d32c492",
+  "layer09": "$OUT/mlruns/566826726846867956/7f529af52bc7458d8db71dfb861d0181",
+  "layer10": "$OUT/mlruns/566826726846867956/1a11e6997a834ae1b2695fd2d8fb329e",
+  "layer11": "$OUT/mlruns/566826726846867956/d375849d260e4d10b9eaa4aae3c9a63f",
+  "layer12": "$OUT/mlruns/566826726846867956/3ee279b82725424cb5047eccf1c87e40",
+  "layer13": "$OUT/mlruns/566826726846867956/805c6e7bfdc1488f80b43b19d0633132",
+  "layer14": "$OUT/mlruns/566826726846867956/9fc50aa725024dc8ba47cfbbc514e1f5",
+  "layer15": "$OUT/mlruns/566826726846867956/24cf9080892c4923b7b75fb709a2502e",
+  "layer16": "$OUT/mlruns/566826726846867956/256e67b854544bc78fb478936f4ef9e3",
+  "layer17": "$OUT/mlruns/566826726846867956/f655844b00c842abaf0e604f6b9400ec",
+  "layer18": "$OUT/mlruns/566826726846867956/18898a4e8bcf4c42a91f4d9c5a7196e3",
+  "layer19": "$OUT/mlruns/566826726846867956/fe64cc7c686645b5995518e6fec27e7d",
+  "layer20": "$OUT/mlruns/566826726846867956/ac193b7effeb4d6899a677c8b7bdd8ea",
+  "layer21": "$OUT/mlruns/566826726846867956/2cabe677b4104b388acedce05226ec47",
+  "layer22": "$OUT/mlruns/566826726846867956/bdd00204f76541f7850e25e14d3a9099",
+  "layer23": "$OUT/mlruns/566826726846867956/20ba0fe51cac4ed5abf8274a7f79a562",
+  "layer04_mean_std": "$OUT/mlruns/566826726846867956/7a8d561c601e4745b1916378e83b8050"
+ },
+ "contrasts": [
+  [
+   "layer00",
+   "layer04"
+  ],
+  [
+   "layer01",
+   "layer04"
+  ],
+  [
+   "layer02",
+   "layer04"
+  ],
+  [
+   "layer03",
+   "layer04"
+  ],
+  [
+   "layer05",
+   "layer04"
+  ],
+  [
+   "layer06",
+   "layer04"
+  ],
+  [
+   "layer07",
+   "layer04"
+  ],
+  [
+   "layer08",
+   "layer04"
+  ],
+  [
+   "layer09",
+   "layer04"
+  ],
+  [
+   "layer10",
+   "layer04"
+  ],
+  [
+   "layer11",
+   "layer04"
+  ],
+  [
+   "layer12",
+   "layer04"
+  ],
+  [
+   "layer13",
+   "layer04"
+  ],
+  [
+   "layer14",
+   "layer04"
+  ],
+  [
+   "layer15",
+   "layer04"
+  ],
+  [
+   "layer16",
+   "layer04"
+  ],
+  [
+   "layer17",
+   "layer04"
+  ],
+  [
+   "layer18",
+   "layer04"
+  ],
+  [
+   "layer19",
+   "layer04"
+  ],
+  [
+   "layer20",
+   "layer04"
+  ],
+  [
+   "layer21",
+   "layer04"
+  ],
+  [
+   "layer22",
+   "layer04"
+  ],
+  [
+   "layer23",
+   "layer04"
+  ],
+  [
+   "layer04_mean_std",
+   "layer04"
+  ]
+ ]
+}

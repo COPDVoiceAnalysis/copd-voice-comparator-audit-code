@@ -1,0 +1,842 @@
+{
+ "voice": {
+  "n_copd": 99,
+  "n_control": 803,
+  "sens_at_spec80": [
+   0.366,
+   0.25,
+   0.475
+  ],
+  "sens_at_spec90": [
+   0.176,
+   0.086,
+   0.286
+  ],
+  "spec_at_sens80": [
+   0.341,
+   0.132,
+   0.475
+  ],
+  "spec_at_sens90": [
+   0.084,
+   0.003,
+   0.337
+  ],
+  "wauroc": [
+   0.618,
+   0.54,
+   0.689
+  ],
+  "cross_fitted": {
+   "sens_at_spec80": {
+    "sensitivity": [
+     0.33,
+     0.25,
+     0.438
+    ],
+    "specificity": [
+     0.799,
+     0.789,
+     0.813
+    ],
+    "n_repeats": 10
+   },
+   "sens_at_spec90": {
+    "sensitivity": [
+     0.177,
+     0.147,
+     0.215
+    ],
+    "specificity": [
+     0.899,
+     0.887,
+     0.906
+    ],
+    "n_repeats": 10
+   },
+   "spec_at_sens80": {
+    "sensitivity": [
+     0.793,
+     0.777,
+     0.812
+    ],
+    "specificity": [
+     0.318,
+     0.236,
+     0.389
+    ],
+    "n_repeats": 10
+   },
+   "spec_at_sens90": {
+    "sensitivity": [
+     0.898,
+     0.865,
+     0.917
+    ],
+    "specificity": [
+     0.125,
+     0.08,
+     0.187
+    ],
+    "n_repeats": 10
+   }
+  },
+  "note": "apparent values: [estimate, 2.5%, 97.5%] from the pooled ROC; cross_fitted: [mean, min, max] over outer repeats, threshold chosen on the other folds"
+ },
+ "voice+age+sex": {
+  "n_copd": 99,
+  "n_control": 803,
+  "sens_at_spec80": [
+   0.322,
+   0.209,
+   0.457
+  ],
+  "sens_at_spec90": [
+   0.178,
+   0.085,
+   0.271
+  ],
+  "spec_at_sens80": [
+   0.367,
+   0.152,
+   0.492
+  ],
+  "spec_at_sens90": [
+   0.077,
+   0.004,
+   0.369
+  ],
+  "wauroc": [
+   0.62,
+   0.54,
+   0.694
+  ],
+  "cross_fitted": {
+   "sens_at_spec80": {
+    "sensitivity": [
+     0.313,
+     0.238,
+     0.438
+    ],
+    "specificity": [
+     0.799,
+     0.789,
+     0.812
+    ],
+    "n_repeats": 10
+   },
+   "sens_at_spec90": {
+    "sensitivity": [
+     0.18,
+     0.113,
+     0.248
+    ],
+    "specificity": [
+     0.9,
+     0.893,
+     0.903
+    ],
+    "n_repeats": 10
+   },
+   "spec_at_sens80": {
+    "sensitivity": [
+     0.796,
+     0.78,
+     0.82
+    ],
+    "specificity": [
+     0.323,
+     0.224,
+     0.416
+    ],
+    "n_repeats": 10
+   },
+   "spec_at_sens90": {
+    "sensitivity": [
+     0.893,
+     0.873,
+     0.911
+    ],
+    "specificity": [
+     0.156,
+     0.097,
+     0.261
+    ],
+    "n_repeats": 10
+   }
+  },
+  "note": "apparent values: [estimate, 2.5%, 97.5%] from the pooled ROC; cross_fitted: [mean, min, max] over outer repeats, threshold chosen on the other folds"
+ },
+ "voice+age+sex+comorb": {
+  "n_copd": 99,
+  "n_control": 803,
+  "sens_at_spec80": [
+   0.336,
+   0.209,
+   0.446
+  ],
+  "sens_at_spec90": [
+   0.173,
+   0.094,
+   0.31
+  ],
+  "spec_at_sens80": [
+   0.385,
+   0.08,
+   0.51
+  ],
+  "spec_at_sens90": [
+   0.061,
+   0.006,
+   0.378
+  ],
+  "wauroc": [
+   0.616,
+   0.539,
+   0.691
+  ],
+  "cross_fitted": {
+   "sens_at_spec80": {
+    "sensitivity": [
+     0.321,
+     0.251,
+     0.411
+    ],
+    "specificity": [
+     0.802,
+     0.794,
+     0.81
+    ],
+    "n_repeats": 10
+   },
+   "sens_at_spec90": {
+    "sensitivity": [
+     0.181,
+     0.117,
+     0.254
+    ],
+    "specificity": [
+     0.9,
+     0.894,
+     0.906
+    ],
+    "n_repeats": 10
+   },
+   "spec_at_sens80": {
+    "sensitivity": [
+     0.787,
+     0.775,
+     0.805
+    ],
+    "specificity": [
+     0.309,
+     0.211,
+     0.383
+    ],
+    "n_repeats": 10
+   },
+   "spec_at_sens90": {
+    "sensitivity": [
+     0.886,
+     0.855,
+     0.907
+    ],
+    "specificity": [
+     0.148,
+     0.102,
+     0.206
+    ],
+    "n_repeats": 10
+   }
+  },
+  "note": "apparent values: [estimate, 2.5%, 97.5%] from the pooled ROC; cross_fitted: [mean, min, max] over outer repeats, threshold chosen on the other folds"
+ },
+ "voice (unweighted)": {
+  "n_copd": 99,
+  "n_control": 803,
+  "sens_at_spec80": [
+   0.318,
+   0.204,
+   0.466
+  ],
+  "sens_at_spec90": [
+   0.194,
+   0.086,
+   0.318
+  ],
+  "spec_at_sens80": [
+   0.365,
+   0.102,
+   0.475
+  ],
+  "spec_at_sens90": [
+   0.076,
+   0.017,
+   0.303
+  ],
+  "wauroc": [
+   0.617,
+   0.538,
+   0.69
+  ],
+  "cross_fitted": {
+   "sens_at_spec80": {
+    "sensitivity": [
+     0.326,
+     0.23,
+     0.434
+    ],
+    "specificity": [
+     0.8,
+     0.793,
+     0.806
+    ],
+    "n_repeats": 10
+   },
+   "sens_at_spec90": {
+    "sensitivity": [
+     0.192,
+     0.126,
+     0.28
+    ],
+    "specificity": [
+     0.897,
+     0.885,
+     0.902
+    ],
+    "n_repeats": 10
+   },
+   "spec_at_sens80": {
+    "sensitivity": [
+     0.796,
+     0.785,
+     0.809
+    ],
+    "specificity": [
+     0.306,
+     0.256,
+     0.357
+    ],
+    "n_repeats": 10
+   },
+   "spec_at_sens90": {
+    "sensitivity": [
+     0.894,
+     0.876,
+     0.908
+    ],
+    "specificity": [
+     0.127,
+     0.093,
+     0.16
+    ],
+    "n_repeats": 10
+   }
+  },
+  "note": "apparent values: [estimate, 2.5%, 97.5%] from the pooled ROC; cross_fitted: [mean, min, max] over outer repeats, threshold chosen on the other folds"
+ },
+ "voice+age+sex (unweighted)": {
+  "n_copd": 99,
+  "n_control": 803,
+  "sens_at_spec80": [
+   0.353,
+   0.205,
+   0.472
+  ],
+  "sens_at_spec90": [
+   0.162,
+   0.082,
+   0.282
+  ],
+  "spec_at_sens80": [
+   0.336,
+   0.092,
+   0.48
+  ],
+  "spec_at_sens90": [
+   0.091,
+   0.016,
+   0.295
+  ],
+  "wauroc": [
+   0.613,
+   0.531,
+   0.688
+  ],
+  "cross_fitted": {
+   "sens_at_spec80": {
+    "sensitivity": [
+     0.332,
+     0.238,
+     0.44
+    ],
+    "specificity": [
+     0.799,
+     0.79,
+     0.809
+    ],
+    "n_repeats": 10
+   },
+   "sens_at_spec90": {
+    "sensitivity": [
+     0.186,
+     0.143,
+     0.264
+    ],
+    "specificity": [
+     0.901,
+     0.893,
+     0.91
+    ],
+    "n_repeats": 10
+   },
+   "spec_at_sens80": {
+    "sensitivity": [
+     0.8,
+     0.785,
+     0.81
+    ],
+    "specificity": [
+     0.304,
+     0.237,
+     0.362
+    ],
+    "n_repeats": 10
+   },
+   "spec_at_sens90": {
+    "sensitivity": [
+     0.891,
+     0.873,
+     0.913
+    ],
+    "specificity": [
+     0.132,
+     0.087,
+     0.154
+    ],
+    "n_repeats": 10
+   }
+  },
+  "note": "apparent values: [estimate, 2.5%, 97.5%] from the pooled ROC; cross_fitted: [mean, min, max] over outer repeats, threshold chosen on the other folds"
+ },
+ "voice+age+sex+comorb (unweighted)": {
+  "n_copd": 99,
+  "n_control": 803,
+  "sens_at_spec80": [
+   0.347,
+   0.221,
+   0.47
+  ],
+  "sens_at_spec90": [
+   0.204,
+   0.086,
+   0.323
+  ],
+  "spec_at_sens80": [
+   0.326,
+   0.094,
+   0.446
+  ],
+  "spec_at_sens90": [
+   0.096,
+   0.008,
+   0.331
+  ],
+  "wauroc": [
+   0.603,
+   0.523,
+   0.681
+  ],
+  "cross_fitted": {
+   "sens_at_spec80": {
+    "sensitivity": [
+     0.327,
+     0.283,
+     0.4
+    ],
+    "specificity": [
+     0.8,
+     0.793,
+     0.812
+    ],
+    "n_repeats": 10
+   },
+   "sens_at_spec90": {
+    "sensitivity": [
+     0.189,
+     0.13,
+     0.304
+    ],
+    "specificity": [
+     0.896,
+     0.882,
+     0.907
+    ],
+    "n_repeats": 10
+   },
+   "spec_at_sens80": {
+    "sensitivity": [
+     0.788,
+     0.752,
+     0.811
+    ],
+    "specificity": [
+     0.293,
+     0.245,
+     0.329
+    ],
+    "n_repeats": 10
+   },
+   "spec_at_sens90": {
+    "sensitivity": [
+     0.888,
+     0.861,
+     0.909
+    ],
+    "specificity": [
+     0.121,
+     0.076,
+     0.161
+    ],
+    "n_repeats": 10
+   }
+  },
+  "note": "apparent values: [estimate, 2.5%, 97.5%] from the pooled ROC; cross_fitted: [mean, min, max] over outer repeats, threshold chosen on the other folds"
+ },
+ "age+sex": {
+  "n_copd": 99,
+  "n_control": 803,
+  "sens_at_spec80": [
+   0.04,
+   0.0,
+   0.112
+  ],
+  "sens_at_spec90": [
+   0.04,
+   0.0,
+   0.099
+  ],
+  "spec_at_sens80": [
+   0.186,
+   0.063,
+   0.279
+  ],
+  "spec_at_sens90": [
+   0.042,
+   0.018,
+   0.1
+  ],
+  "wauroc": [
+   0.408,
+   0.344,
+   0.473
+  ],
+  "cross_fitted": {
+   "sens_at_spec80": {
+    "sensitivity": [
+     0.162,
+     0.116,
+     0.21
+    ],
+    "specificity": [
+     0.787,
+     0.741,
+     0.815
+    ],
+    "n_repeats": 10
+   },
+   "sens_at_spec90": {
+    "sensitivity": [
+     0.07,
+     0.029,
+     0.119
+    ],
+    "specificity": [
+     0.887,
+     0.859,
+     0.918
+    ],
+    "n_repeats": 10
+   },
+   "spec_at_sens80": {
+    "sensitivity": [
+     0.738,
+     0.617,
+     0.816
+    ],
+    "specificity": [
+     0.239,
+     0.163,
+     0.359
+    ],
+    "n_repeats": 10
+   },
+   "spec_at_sens90": {
+    "sensitivity": [
+     0.859,
+     0.764,
+     0.922
+    ],
+    "specificity": [
+     0.122,
+     0.048,
+     0.212
+    ],
+    "n_repeats": 10
+   }
+  },
+  "note": "apparent values: [estimate, 2.5%, 97.5%] from the pooled ROC; cross_fitted: [mean, min, max] over outer repeats, threshold chosen on the other folds"
+ },
+ "age+sex (weighted)": {
+  "n_copd": 99,
+  "n_control": 803,
+  "sens_at_spec80": [
+   0.183,
+   0.093,
+   0.288
+  ],
+  "sens_at_spec90": [
+   0.051,
+   0.011,
+   0.106
+  ],
+  "spec_at_sens80": [
+   0.131,
+   0.098,
+   0.285
+  ],
+  "spec_at_sens90": [
+   0.109,
+   0.051,
+   0.157
+  ],
+  "wauroc": [
+   0.479,
+   0.412,
+   0.547
+  ],
+  "cross_fitted": {
+   "sens_at_spec80": {
+    "sensitivity": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "specificity": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "n_repeats": 10
+   },
+   "sens_at_spec90": {
+    "sensitivity": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "specificity": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "n_repeats": 10
+   },
+   "spec_at_sens80": {
+    "sensitivity": [
+     0.768,
+     0.67,
+     0.819
+    ],
+    "specificity": [
+     0.218,
+     0.175,
+     0.404
+    ],
+    "n_repeats": 10
+   },
+   "spec_at_sens90": {
+    "sensitivity": [
+     0.785,
+     0.754,
+     0.838
+    ],
+    "specificity": [
+     0.198,
+     0.175,
+     0.212
+    ],
+    "n_repeats": 10
+   }
+  },
+  "note": "apparent values: [estimate, 2.5%, 97.5%] from the pooled ROC; cross_fitted: [mean, min, max] over outer repeats, threshold chosen on the other folds"
+ },
+ "age+sex+comorb": {
+  "n_copd": 99,
+  "n_control": 803,
+  "sens_at_spec80": [
+   0.174,
+   0.076,
+   0.293
+  ],
+  "sens_at_spec90": [
+   0.134,
+   0.049,
+   0.221
+  ],
+  "spec_at_sens80": [
+   0.135,
+   0.046,
+   0.273
+  ],
+  "spec_at_sens90": [
+   0.03,
+   0.011,
+   0.082
+  ],
+  "wauroc": [
+   0.477,
+   0.404,
+   0.55
+  ],
+  "cross_fitted": {
+   "sens_at_spec80": {
+    "sensitivity": [
+     0.232,
+     0.168,
+     0.319
+    ],
+    "specificity": [
+     0.802,
+     0.775,
+     0.82
+    ],
+    "n_repeats": 10
+   },
+   "sens_at_spec90": {
+    "sensitivity": [
+     0.111,
+     0.065,
+     0.153
+    ],
+    "specificity": [
+     0.891,
+     0.87,
+     0.907
+    ],
+    "n_repeats": 10
+   },
+   "spec_at_sens80": {
+    "sensitivity": [
+     0.776,
+     0.724,
+     0.81
+    ],
+    "specificity": [
+     0.205,
+     0.161,
+     0.236
+    ],
+    "n_repeats": 10
+   },
+   "spec_at_sens90": {
+    "sensitivity": [
+     0.858,
+     0.729,
+     0.916
+    ],
+    "specificity": [
+     0.124,
+     0.069,
+     0.236
+    ],
+    "n_repeats": 10
+   }
+  },
+  "note": "apparent values: [estimate, 2.5%, 97.5%] from the pooled ROC; cross_fitted: [mean, min, max] over outer repeats, threshold chosen on the other folds"
+ },
+ "age+sex+comorb (weighted)": {
+  "n_copd": 99,
+  "n_control": 803,
+  "sens_at_spec80": [
+   0.173,
+   0.086,
+   0.279
+  ],
+  "sens_at_spec90": [
+   0.057,
+   0.014,
+   0.108
+  ],
+  "spec_at_sens80": [
+   0.203,
+   0.086,
+   0.293
+  ],
+  "spec_at_sens90": [
+   0.082,
+   0.054,
+   0.163
+  ],
+  "wauroc": [
+   0.485,
+   0.419,
+   0.553
+  ],
+  "cross_fitted": {
+   "sens_at_spec80": {
+    "sensitivity": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "specificity": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "n_repeats": 10
+   },
+   "sens_at_spec90": {
+    "sensitivity": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "specificity": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "n_repeats": 10
+   },
+   "spec_at_sens80": {
+    "sensitivity": [
+     0.759,
+     0.62,
+     0.842
+    ],
+    "specificity": [
+     0.242,
+     0.189,
+     0.404
+    ],
+    "n_repeats": 10
+   },
+   "spec_at_sens90": {
+    "sensitivity": [
+     0.8,
+     0.754,
+     0.866
+    ],
+    "specificity": [
+     0.201,
+     0.189,
+     0.212
+    ],
+    "n_repeats": 10
+   }
+  },
+  "note": "apparent values: [estimate, 2.5%, 97.5%] from the pooled ROC; cross_fitted: [mean, min, max] over outer repeats, threshold chosen on the other folds"
+ }
+}

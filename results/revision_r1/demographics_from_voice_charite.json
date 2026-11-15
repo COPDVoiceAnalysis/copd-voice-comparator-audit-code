@@ -1,0 +1,101 @@
+{
+ "cohort": "charite",
+ "preproc": "norm_on",
+ "layer": 4,
+ "split": true,
+ "n": 99,
+ "n_scored_without_embedding": 0,
+ "A": {
+  "all": {
+   "n": 99,
+   "age": {
+    "r2": 0.316,
+    "mae": 7.26,
+    "mae_mean_baseline": 8.28,
+    "pearson_r": 0.565,
+    "age_sd": 11.76
+   },
+   "sex": {
+    "auroc": 0.98,
+    "n_male": 48,
+    "n": 99
+   }
+  },
+  "copd_only": {
+   "n": 77,
+   "age": {
+    "r2": 0.199,
+    "mae": 5.81,
+    "mae_mean_baseline": 6.55,
+    "pearson_r": 0.461,
+    "age_sd": 8.68
+   },
+   "sex": {
+    "auroc": 0.974,
+    "n_male": 40,
+    "n": 77
+   }
+  },
+  "matched": {
+   "n": 55,
+   "age": {
+    "r2": -0.159,
+    "mae": 3.81,
+    "mae_mean_baseline": 3.75,
+    "pearson_r": 0.089,
+    "age_sd": 4.46
+   },
+   "sex": {
+    "auroc": 0.975,
+    "n_male": 25,
+    "n": 55
+   }
+  }
+ },
+ "B": {
+  "all": {
+   "auroc_of_score": 0.787,
+   "score_vs_age_within_class": {
+    "copd": {
+     "n": 77,
+     "rho": 0.224,
+     "p": 0.0498
+    },
+    "control": {
+     "n": 22,
+     "rho": 0.127,
+     "p": 0.5724
+    }
+   },
+   "lr_test_score_beyond_age_sex": {
+    "lr_chi2": 12.63,
+    "p": 0.00037990806367346655,
+    "coef_score": 3.76,
+    "coef_age_without_score": 0.0563,
+    "coef_age_with_score": 0.0402
+   }
+  },
+  "matched": {
+   "auroc_of_score": 0.736,
+   "score_vs_age_within_class": {
+    "copd": {
+     "n": 43,
+     "rho": 0.32,
+     "p": 0.0365
+    },
+    "control": {
+     "n": 12,
+     "rho": 0.049,
+     "p": 0.8789
+    }
+   },
+   "lr_test_score_beyond_age_sex": {
+    "lr_chi2": 7.08,
+    "p": 0.007792277795914095,
+    "coef_score": 3.503,
+    "coef_age_without_score": 0.0519,
+    "coef_age_with_score": 0.02
+   }
+  }
+ }
+}
