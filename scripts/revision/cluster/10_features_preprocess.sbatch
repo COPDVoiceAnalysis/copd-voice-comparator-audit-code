@@ -14,6 +14,6 @@ OUTD="$FB/preprocessed__$PREPROC"
 mkdir -p "$OUTD"
 log "preprocess $RAW_DIR -> $OUTD ($NORM)"
 uv run --frozen -m src.utils.recording_preprocessing --input_dir "$RAW_DIR" --output_dir "$OUTD" \
-  --metadata_file "$RAW_DIR/merged_metadata.csv" $NORM
+  --metadata_file "$OUT/merged_metadata_remapped.csv" $NORM
 uv run --frozen -m src.utils.split_poem --metadata "$OUTD/metadata.csv" --output_dir "$OUTD"
 log "done"
