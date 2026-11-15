@@ -1,0 +1,64 @@
+{
+ "cohort": "uk",
+ "preproc": "norm_on",
+ "layer": 4,
+ "split": false,
+ "n": 902,
+ "n_scored_without_embedding": 0,
+ "A": {
+  "all": {
+   "n": 902,
+   "age": {
+    "r2": 0.461,
+    "mae": 8.93,
+    "mae_mean_baseline": 13.11,
+    "pearson_r": 0.679,
+    "age_sd": 14.99
+   },
+   "sex": {
+    "auroc": 0.978,
+    "n_male": 608,
+    "n": 902
+   }
+  },
+  "copd_only": {
+   "n": 99,
+   "age": {
+    "r2": 0.556,
+    "mae": 8.5,
+    "mae_mean_baseline": 13.61,
+    "pearson_r": 0.75,
+    "age_sd": 15.73
+   },
+   "sex": {
+    "auroc": 0.983,
+    "n_male": 68,
+    "n": 99
+   }
+  }
+ },
+ "B": {
+  "all": {
+   "auroc_of_score": 0.609,
+   "score_vs_age_within_class": {
+    "copd": {
+     "n": 99,
+     "rho": 0.257,
+     "p": 0.0101
+    },
+    "control": {
+     "n": 803,
+     "rho": 0.116,
+     "p": 0.001
+    }
+   },
+   "lr_test_score_beyond_age_sex": {
+    "lr_chi2": 11.08,
+    "p": 0.0008738405334503494,
+    "coef_score": 2.368,
+    "coef_age_without_score": 0.0103,
+    "coef_age_with_score": 0.0077
+   }
+  }
+ }
+}

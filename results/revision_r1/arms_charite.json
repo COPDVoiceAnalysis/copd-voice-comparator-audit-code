@@ -1,0 +1,55 @@
+{
+ "arms": {
+  "voice": "/data/cephfs-1/home/users/leko22_c/work/revision_sensors_r1/mlruns/566826726846867956/9d2565a6800b4c558f4df4f13e0d52fa",
+  "voice+age+sex": "/data/cephfs-1/home/users/leko22_c/work/revision_sensors_r1/mlruns/566826726846867956/bc6d135453ff42d087862cae4a5dbf8d",
+  "voice+age+sex+comorb": "/data/cephfs-1/home/users/leko22_c/work/revision_sensors_r1/mlruns/566826726846867956/bc5207982a5145ea9bc1849aea256a6d",
+  "age": "/data/cephfs-1/home/users/leko22_c/work/revision_sensors_r1/comparators/mlruns/555260856643413123/f379ef0c28ab4ca68386c0ede6b6aed7",
+  "age (weighted)": "/data/cephfs-1/home/users/leko22_c/work/revision_sensors_r1/comparators/mlruns/555260856643413123/d5b1943e437e4ff487af8b0985967b86",
+  "age+sex": "/data/cephfs-1/home/users/leko22_c/work/revision_sensors_r1/comparators/mlruns/555260856643413123/fa1010adb0cd4b9c89ff4cd0525a2eb7",
+  "age+sex (weighted)": "/data/cephfs-1/home/users/leko22_c/work/revision_sensors_r1/comparators/mlruns/555260856643413123/5cd8974e4737491d81295c403773faaf",
+  "age+sex+comorb": "/data/cephfs-1/home/users/leko22_c/work/revision_sensors_r1/comparators/mlruns/555260856643413123/e4789a768e554968be332012b99f9d23",
+  "age+sex+comorb (weighted)": "/data/cephfs-1/home/users/leko22_c/work/revision_sensors_r1/comparators/mlruns/555260856643413123/9c834372f1f64be6b3593934b87d3ea0"
+ },
+ "contrasts": [
+  [
+   "voice+age+sex",
+   "voice"
+  ],
+  [
+   "voice+age+sex+comorb",
+   "voice"
+  ],
+  [
+   "voice",
+   "age"
+  ],
+  [
+   "voice",
+   "age (weighted)"
+  ],
+  [
+   "voice",
+   "age+sex"
+  ],
+  [
+   "voice",
+   "age+sex (weighted)"
+  ],
+  [
+   "voice",
+   "age+sex+comorb"
+  ],
+  [
+   "voice",
+   "age+sex+comorb (weighted)"
+  ],
+  [
+   "voice+age+sex",
+   "age+sex"
+  ],
+  [
+   "voice+age+sex+comorb",
+   "age+sex+comorb"
+  ]
+ ]
+}

@@ -1,0 +1,24 @@
+collected 2026-11-15T18:22:41+00:00
+code commit b4a12b82e8aa9f2b90b03027ef4594cf15d818fc
+SMOKE=0 PREPROC=norm_on
+features /data/cephfs-1/home/users/leko22_c/work/revision_sensors_r1_features/2025-08-13
+
+files:
+STATUS.txt
+arms_charite.json
+arms_layers.json
+arms_uk.json
+crossdataset_summary.csv
+demographics_from_voice_charite.json
+demographics_from_voice_uk.json
+fold_predictions_charite.pdf
+fold_predictions_charite.png
+fold_predictions_uk.pdf
+fold_predictions_uk.png
+operating_points_charite.json
+operating_points_uk.json
+paired_bootstrap_charite.json
+paired_bootstrap_layers.json
+paired_bootstrap_uk.json
+recording_summary.csv
+preflight_report.txt
