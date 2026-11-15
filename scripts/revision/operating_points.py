@@ -6,6 +6,15 @@ paper_bootstrap_charite.py does), and reports strata-weighted sensitivity at
 specificity 0.80 and 0.90 and specificity at sensitivity 0.80 and 0.90, with a
 class-stratified participant bootstrap (B = 5000).
 
+These "apparent" values read the threshold off the pooled out-of-fold ROC, so
+the threshold is chosen on the same predictions it is scored on, which is
+optimistic. The "cross_fitted" block avoids that: within each outer repeat,
+the threshold for test fold k is chosen on the participants of the other folds
+(their out-of-fold scores) and applied to fold k; sensitivity and specificity
+are then pooled over the folds of the repeat, and the block reports the mean
+and the range over repeats. A threshold that targets specificity 0.90 then
+reaches roughly that specificity on new participants, not exactly.
+
 Usage: uv run python scripts/revision/operating_points.py <run_dir> [<run_dir> ...]
        uv run python scripts/revision/operating_points.py arms.json
        (arms.json as for paired_bootstrap.py; results are keyed by arm label)
@@ -55,6 +64,56 @@ def points(y, p, w):
     return out
 
 
+K_OUTER = 5  # outer splits per repeat (training_config.n_splits_outer of all revision runs)
+
+
+def pick_threshold(y, p, w, kind, level):
+    """Score threshold (positive if p >= t) meeting the target on these participants."""
+    ts = np.unique(p)
+    pos, neg = y == 1, y == 0
+    sens = np.array([w[pos & (p >= t)].sum() for t in ts]) / w[pos].sum()
+    spec = np.array([w[neg & (p < t)].sum() for t in ts]) / w[neg].sum()
+    if kind == "spec":  # lowest threshold with spec >= level, i.e. the most sensitive one
+        ok = np.where(spec >= level)[0]
+        return ts[ok[0]] if len(ok) else np.inf
+    ok = np.where(sens >= level)[0]  # highest threshold with sens >= level
+    return ts[ok[-1]] if len(ok) else -np.inf
+
+
+def cross_fitted(run_dir):
+    files = glob.glob(f"{run_dir}/artifacts/fold_predictions/*.parquet")
+    df = pd.concat([pd.read_parquet(f) for f in files], ignore_index=True)
+    df["repeat"] = (df["fold"] - 1) // K_OUTER
+    per_repeat = {k: [] for k in TARGETS}
+    for _, r in df.groupby("repeat"):
+        part = r.groupby(["fold", "audio_id"]).agg(y=("true", "first"), p=("proba_copd", "mean"),
+                                                   w=("strata_weight", "mean")).reset_index()
+        if part["y"].nunique() < 2:
+            continue
+        for name, (kind, level) in TARGETS.items():
+            pred = np.zeros(len(part), dtype=bool)
+            for k in part["fold"].unique():
+                te = (part["fold"] == k).to_numpy()
+                tr = ~te
+                t = pick_threshold(part.y[tr].to_numpy(), part.p[tr].to_numpy(), part.w[tr].to_numpy(), kind, level)
+                pred[te] = part.p[te].to_numpy() >= t
+            y, w = part.y.to_numpy(), part.w.to_numpy()
+            sens = w[(y == 1) & pred].sum() / w[y == 1].sum()
+            spec = w[(y == 0) & ~pred].sum() / w[y == 0].sum()
+            per_repeat[name].append((sens, spec))
+    out = {}
+    for name, vals in per_repeat.items():
+        if not vals:
+            continue
+        v = np.array(vals)
+        out[name] = {"sensitivity": [round(float(v[:, 0].mean()), 3), round(float(v[:, 0].min()), 3),
+                                     round(float(v[:, 0].max()), 3)],
+                     "specificity": [round(float(v[:, 1].mean()), 3), round(float(v[:, 1].min()), 3),
+                                     round(float(v[:, 1].max()), 3)],
+                     "n_repeats": len(v)}
+    return out
+
+
 def main():
     res = {}
     if len(sys.argv) == 2 and sys.argv[1].endswith(".json"):
@@ -71,8 +130,11 @@ def main():
             for k, v in points(y[idx], p[idx], w[idx]).items():
                 draws[k].append(v)
         res[label] = {"n_copd": int(len(pos)), "n_control": int(len(neg)),
-                        **{k: [round(est[k], 3), round(float(np.percentile(draws[k], 2.5)), 3),
-                               round(float(np.percentile(draws[k], 97.5)), 3)] for k in est}}
+                      **{k: [round(est[k], 3), round(float(np.percentile(draws[k], 2.5)), 3),
+                             round(float(np.percentile(draws[k], 97.5)), 3)] for k in est},
+                      "cross_fitted": cross_fitted(run_dir),
+                      "note": "apparent values: [estimate, 2.5%, 97.5%] from the pooled ROC; "
+                              "cross_fitted: [mean, min, max] over outer repeats, threshold chosen on the other folds"}
     print(json.dumps(res, indent=1))
 
 

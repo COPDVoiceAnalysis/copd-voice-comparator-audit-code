@@ -24,7 +24,7 @@ export REV_LAYERS=$LAYERS
 want() { [[ ",$ONLY," == *",$1,"* ]]; }
 [ -s "$OUT/preflight_report.txt" ] || die "run 00_preflight.sh and 01_setup.sh first"
 [ -d "data/$DATE" ] || die "data/$DATE missing: run 01_setup.sh first"
-N_TRAIN=$((6 + 26 * LAYERS))
+N_TRAIN=$((12 + 26 * LAYERS))  # 6 voice arms, 6 unweighted twins, 26 layer runs
 JOBS="$OUT/state/jobs.txt"
 echo "# submitted $(date '+%F %T %Z') SMOKE=$SMOKE LAYERS=$LAYERS ONLY=$ONLY" >> "$JOBS"
 

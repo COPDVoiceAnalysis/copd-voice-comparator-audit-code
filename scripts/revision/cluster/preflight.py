@@ -102,12 +102,16 @@ def main():
         mm = pd.read_csv(RAW / "merged_metadata.csv", low_memory=False)
         for src in ("charite", "uk_covid"):
             say("INFO", f"merged_metadata: {mm[mm.data_source == src].audio_id.nunique()} {src} participants")
-        paths = mm.audio_sample_path.dropna()
-        sample = paths.sample(min(20, len(paths)), random_state=0)
-        found = sum(os.path.exists(p) or os.path.exists(RAW / os.path.basename(p)) for p in sample)
-        say("OK" if found == len(sample) else "WARN",
-            f"raw audio: {found} of {len(sample)} sampled recordings found (needed only to build features "
-            f"and for the sample-rate table)")
+        old, new = E.get("UK_AUDIO_FROM", ""), E.get("UK_AUDIO_TO", "")
+        for src in ("charite", "uk_covid"):
+            paths = mm.loc[mm.data_source == src, "audio_sample_path"].dropna().astype(str)
+            if old and new:
+                paths = paths.str.replace(old, new, regex=False)
+            sample = paths.sample(min(20, len(paths)), random_state=0)
+            found = sum(os.path.exists(p) or os.path.exists(RAW / os.path.basename(p)) for p in sample)
+            say("OK" if found == len(sample) else "WARN",
+                f"raw audio {src}: {found} of {len(sample)} sampled recordings found after UK path remapping "
+                "(needed to build features and for the sample-rate table)")
     if readable(RAW / "uk_matched_metadata.csv"):
         uk = pd.read_csv(RAW / "uk_matched_metadata.csv").drop_duplicates("audio_id")
         say("INFO", f"uk_matched_metadata: {len(uk)} participants")

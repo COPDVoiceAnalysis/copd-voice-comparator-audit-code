@@ -15,8 +15,10 @@ three commands, wait, run one more command, push `results/revision_r1/`.
 git clone -b revision-sensors-r1 git@github.com:COPDVoiceAnalysis/copd-voice-comparator-audit-code.git
 cd copd-voice-comparator-audit-code
 $EDITOR scripts/revision/cluster/revision.env          # check every path
-bash scripts/revision/cluster/00_preflight.sh          # read-only check, ~1 min
-bash scripts/revision/cluster/01_setup.sh              # env + data links, login node
+bash scripts/revision/cluster/00_preflight.sh          # checks inputs (creates the venv), ~2 min
+srun --partition=short --cpus-per-task=2 --mem=8G --time=01:00:00 --pty bash   # setup on a compute node
+bash scripts/revision/cluster/01_setup.sh              # model download, UK path remap, data links
+exit                                                   # back to the login node
 bash scripts/revision/cluster/run_all.sh               # submits all Slurm jobs
 # ... wait until `squeue --me` is empty, then:
 cat ~/work/revision_sensors_r1/analysis/STATUS.txt     # every line should say OK (MISSING = a run that did not finish)
@@ -35,7 +37,8 @@ git add results/revision_r1 && git commit -m "revision: cluster results" && git 
   (`audio_id`, `study_id`, `uid`, `recording_identifier`, `birth_year`,
   `audio_sample_path`), any CSV over 500 rows and any file over 2 MB; refused
   files are listed in `results/revision_r1/MANIFEST.txt` and the script exits
-  with code 1.
+  with code 1. In text files, absolute paths are shortened to `$OUT`, `$REPO`
+  or `<home>`, so no cluster user names leave with the results.
 - Do not loosen these checks to make a file pass. If something needed is
   refused, ask the corresponding author.
 
@@ -43,8 +46,8 @@ git add results/revision_r1 && git commit -m "revision: cluster results" && git 
 
 | Reviewer point | What | Script | Output in `results/revision_r1/` |
 |---|---|---|---|
-| R1.1 incremental value | voice vs voice+age+sex vs voice+age+sex+comorbidities vs demographic comparators (weighted as published, and unweighted), paired participant bootstrap | `paired_bootstrap.py` | `paired_bootstrap_{charite,uk}.json` |
-| R1.7 clinical operating points | sensitivity at specificity 0.80/0.90, specificity at sensitivity 0.80/0.90, with CIs | `operating_points.py` | `operating_points_{charite,uk}.json` |
+| R1.1 incremental value | voice vs voice+age+sex vs voice+age+sex+comorbidities vs demographic comparators, each trained with the published `ps_overlap` weights and without weights ("unweighted"), paired participant bootstrap | `paired_bootstrap.py` | `paired_bootstrap_{charite,uk}.json` |
+| R1.7 clinical operating points | sensitivity at specificity 0.80/0.90, specificity at sensitivity 0.80/0.90: apparent (threshold read off the pooled ROC, with CIs) and cross-fitted (threshold chosen on the other folds) | `operating_points.py` | `operating_points_{charite,uk}.json` |
 | R2.1 comparator mechanism | participant-level predictions and per-fold weighted AUROC, voice vs age+sex (weighted / unweighted) | `fold_prediction_figure.py` | `fold_predictions_{charite,uk}.{pdf,png}` |
 | R1.2 demographic confounding | age and sex decoded from the voice embeddings (whole cohort, matched subset, COPD only); voice score vs age within class; likelihood-ratio test of the score beyond age+sex | `demographics_from_voice.py` | `demographics_from_voice_{charite,uk}.json` |
 | R1.5 cross-cohort, same language | PSM-matched Charité <-> UK, once with all UK participants and once with German-language UK participants only | `src/train_cross_dataset.py --uk_languages de`, `summarize_crossdataset.py` | `crossdataset_summary.csv` |
@@ -59,10 +62,16 @@ whole poem, logistic regression), same nested person-aware CV (5 outer splits ×
 strata-weighted evaluation. **Do not change seeds, grids, CV sizes or
 weightings**: the point of the reruns is that they match the paper.
 
-One deliberate difference: the scope `voice_plus_age_sex` has no entry in
-`config/pipeline_config.yml` and would fall back to the training default
-(age, sex, BMI); `arms.py` sets it to age and sex only, matching the age+sex
-comparator it is compared with.
+Two additions beyond the published setup:
+
+- The scope `voice_plus_age_sex` has no entry in `config/pipeline_config.yml`
+  and would fall back to the training default (age, sex, BMI); `arms.py` sets
+  it to age and sex only, matching the age+sex comparator it is compared with.
+- Every voice arm also runs without training weights (run name ends in
+  `__flat`). Overlap weights balance age and sex between the classes by
+  design, so under them "voice+age+sex minus voice" is near zero for
+  structural reasons; the unweighted twins show what age and sex add when the
+  model may use them.
 
 The model runs ("arms") are defined in one place, `arms.py`; the MLflow run
 name of each arm is its config file name, so every result can be traced to its
@@ -84,15 +93,21 @@ It is the only file that should need editing. Check:
   numbers" step is skipped.
 - `NEW_FEATURES_BASE`, `OUT`: your own persistent storage (under `~/work`, not
   `~/scratch`, which is purged after 14 days).
+- `UK_AUDIO_FROM`, `UK_AUDIO_TO`: the UK audio paths in `merged_metadata.csv`
+  point into the former account; `01_setup.sh` writes
+  `$OUT/merged_metadata_remapped.csv` with the group-mirror prefix instead.
 - `UV_CACHE_DIR`, `HF_HOME`: caches on `~/work` because the home quota is small.
-- `SBATCH_CPU_ARGS`, `SBATCH_GPU_ARGS`: partition names (`sinfo -s`). The GPU is
+- `UV_PROJECT_ENVIRONMENT`: the revision's own virtual environment. Without it,
+  `uv` may replace the environment another project uses in your shell.
+- `SBATCH_CPU_ARGS`, `SBATCH_GPU_ARGS`: partition names (`sinfo -s`). The
+  default `standard` partition stops jobs after 8 h, hence `medium`. The GPU is
   needed only if the features must be rebuilt.
 
 `uv` must be installed (`curl -LsSf https://astral.sh/uv/install.sh | sh`).
 
-### 3.1 `00_preflight.sh` (read-only)
+### 3.1 `00_preflight.sh` (reads the data, writes only to `$OUT` and the venv)
 
-Checks every input and prints one line per check (`OK`, `INFO`, `WARN`,
+Creates the revision's virtual environment on first use, checks every input and prints one line per check (`OK`, `INFO`, `WARN`,
 `FAIL`), and writes `$OUT/preflight_report.txt`. It ends with two verdicts:
 
 - `VERDICT features`: which feature directory will be used: your own (already
@@ -103,10 +118,13 @@ Fix every `FAIL` before going on (usually a path in `revision.env`). A `WARN`
 about raw audio matters only if the features must be rebuilt, and for the
 sample-rate table.
 
-### 3.2 `01_setup.sh` (login node, needs internet)
+### 3.2 `01_setup.sh` (compute node via `srun`, needs internet)
 
-Installs the locked Python environment (`uv sync --frozen`), downloads the
-wav2vec2 model if the features must be rebuilt, and creates **symlinks** in
+Login nodes stop long downloads, so run it in an `srun` shell (compute nodes
+have internet). It installs the locked Python environment (`uv sync
+--frozen`), downloads the wav2vec2 model if the features must be rebuilt,
+writes `$OUT/merged_metadata_remapped.csv` (UK audio paths remapped, and prints
+how many recordings it finds per cohort), and creates **symlinks** in
 `data/` inside the repo (`data/2025-08-13/...` and `data/uk_matched_*.csv`)
 pointing at the chosen feature directory and at `RAW_DIR`. The analysis scripts
 read these relative paths. Nothing is copied.
@@ -124,7 +142,7 @@ current shell instead of Slurm (for an interactive node or testing).
 | `rev-parselmouth` | only if BUILD NEEDED | 48 CPU, 128 GB | up to 8 h | Parselmouth features (rule `parselmouth`); needed by config validation only |
 | `rev-wav2vec` | only if BUILD NEEDED | 1 GPU | 1-3 h | wav2vec2 embeddings, all layers (rule `wav2vec_embeddings`) |
 | `rev-configs` | after features | 1 CPU | 1 min | writes `$OUT/configs/*__config.yml` and `train_list.txt` |
-| `rev-train` (array 0-31) | after configs | 16 CPU, 32 GB each | 0.5-3 h each | 6 voice arms + 26 layer-sweep runs (`src.train`) |
+| `rev-train` (array 0-37) | after configs | 16 CPU, 32 GB each | 0.5-3 h each | 6 voice arms, their 6 unweighted twins, 26 layer-sweep runs (`src.train`) |
 | `rev-comparators-charite` | after features | 8 CPU | < 1 h | demographic comparators, weighted and unweighted |
 | `rev-comparators-uk` | after the train array | 8 CPU | < 1 h | same for UK; its cohort is the UK voice run's participants |
 | `rev-xds-all`, `rev-xds-de` | after features | 32 CPU | up to 12 h | cross-cohort transfer, all UK / German UK |
@@ -159,6 +177,12 @@ the real `OUT` back afterwards.
 - `rev-analysis` is cheap; rerun it alone with `run_all.sh --only analysis`.
 - The analysis picks the newest **finished** MLflow run per name, so failed or
   cancelled runs are ignored.
+- Updating the code after a finished run: never `git pull` while jobs are
+  queued or running (jobs read the scripts when they start). Afterwards, undo
+  local edits to tracked scripts (`git checkout -- <file>`; keep your
+  `revision.env` with `git stash` / `git stash pop` if it differs from the new
+  defaults), `git pull`, then `bash scripts/revision/cluster/run_all.sh --only
+  train,analysis`. Finished runs are skipped; only new arms train.
 
 Common problems:
 

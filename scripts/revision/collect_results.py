@@ -7,12 +7,16 @@ carry participant-level data:
     (audio_id, study_id, uid, recording_identifier, birth_year, audio_sample_path)
   - CSV files with more than MAX_ROWS rows, any file over MAX_BYTES
 Fold predictions, configs, MLflow runs and logs are never copied.
+In text files (JSON, CSV, TXT) absolute paths are shortened: $OUT and the repo
+root become "$OUT" and "$REPO", and any remaining home directory becomes
+"<home>", so no cluster user names leave with the results.
 Writes MANIFEST.txt (git commit, date, SMOKE flag, file list) next to the files.
 
 Usage: uv run python scripts/revision/collect_results.py <OUT> <repo>/results/revision_r1
 """
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -53,6 +57,16 @@ def problem(path):
     return None
 
 
+HOME_RE = re.compile(r"/data/cephfs-1/(?:home|work|scratch)/users/[^/\s\"']+|/Users/[^/\s\"']+|/home/[^/\s\"']+")
+
+
+def sanitize(text, out, repo):
+    for path, tag in sorted([(str(out.resolve()), "$OUT"), (str(out), "$OUT"),
+                             (str(repo.resolve()), "$REPO")], key=lambda x: -len(x[0])):
+        text = text.replace(path, tag)
+    return HOME_RE.sub("<home>", text)
+
+
 def main():
     out, dest = Path(sys.argv[1]), Path(sys.argv[2])
     src = [p for p in sorted((out / "analysis").rglob("*")) if p.is_file() and p.suffix in ALLOWED]
@@ -68,12 +82,16 @@ def main():
             continue
         rel = p.relative_to(out / "analysis") if (out / "analysis") in p.parents else Path(p.name)
         (dest / rel).parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(p, dest / rel)
+        if p.suffix in {".json", ".csv", ".txt"}:
+            (dest / rel).write_text(sanitize(p.read_text(), out, Path.cwd()))
+        else:
+            shutil.copy2(p, dest / rel)
         copied.append(str(rel))
     commit = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True).stdout.strip()
     manifest = [f"collected {datetime.now(timezone.utc).isoformat(timespec='seconds')}",
                 f"code commit {commit}", f"SMOKE={os.environ.get('SMOKE', '?')} PREPROC={os.environ.get('PREPROC', '?')}",
-                f"features {(out / 'state' / 'features_base').read_text().strip() if (out / 'state' / 'features_base').exists() else '?'}",
+                "features " + sanitize((out / "state" / "features_base").read_text().strip()
+                                       if (out / "state" / "features_base").exists() else "?", out, Path.cwd()),
                 "", "files:", *copied]
     if refused:
         manifest += ["", "REFUSED (not copied):", *refused]

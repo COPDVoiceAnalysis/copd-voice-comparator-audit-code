@@ -83,6 +83,11 @@ def voice_id(preproc, cohort, scope):
     return f"{preproc}__{scope}__wav2vec_poem__extended__{c['task']}__{c['splitting']}__{c['classifier']}"
 
 
+def flat_id(preproc, cohort, scope):
+    """Same voice arm, trained without covariate weights (Reviewer 1, point 1)."""
+    return voice_id(preproc, cohort, scope) + "__flat"
+
+
 def layer_id(preproc, layer, stat="mean"):
     base = voice_id(preproc, "charite", "voice_only")
     return f"{base}__layer{layer:02d}" + ("" if stat == "mean" else f"__{stat}")
@@ -133,6 +138,19 @@ def make_configs(a):
             path = out / f"{cid}__config.yml"
             path.write_text(yaml.safe_dump(cfg, sort_keys=False))
             written.append(path)
+    # Unweighted twins of the voice arms. Under ps_overlap weights age and sex are
+    # balanced between the classes by design, so "voice+age+sex minus voice" would
+    # be near zero for structural reasons; the flat twins measure what age and sex
+    # add when the model may use them, against the flat comparators.
+    for cohort in COHORTS:
+        for scope in VOICE_SCOPES.values():
+            cfg = yaml.safe_load(open(out / f"{voice_id(a.preproc, cohort, scope)}__config.yml"))
+            cfg["training_config"]["sample_weight_strategy"] = "flat"
+            cid = flat_id(a.preproc, cohort, scope)
+            cfg["experiment_name"] = cid
+            path = out / f"{cid}__config.yml"
+            path.write_text(yaml.safe_dump(cfg, sort_keys=False))
+            written.append(path)
     for path in written:
         cfg = yaml.safe_load(open(path))
         if a.smoke:
@@ -172,6 +190,8 @@ def resolve(a):
 
     for cohort, c in COHORTS.items():
         arms = {label: get(voice_id(a.preproc, cohort, scope)) for label, scope in VOICE_SCOPES.items()}
+        for label, scope in VOICE_SCOPES.items():
+            arms[label + " (unweighted)"] = get(flat_id(a.preproc, cohort, scope))
         for label, scope in COMPARATORS[cohort].items():
             for w, suffix in [("flat", ""), ("ps_overlap", " (weighted)")]:
                 arms[label + suffix] = get(f"{scope}__extended__{c['task']}__{w}__seed42")
@@ -180,6 +200,12 @@ def resolve(a):
             contrasts.append(["voice", label])
             contrasts.append(["voice", label + " (weighted)"])
         contrasts += [["voice+age+sex", "age+sex"], ["voice+age+sex+comorb", "age+sex+comorb"]]
+        # all-unweighted comparisons: incremental value of age/sex and of voice
+        contrasts += [["voice+age+sex (unweighted)", "voice (unweighted)"],
+                      ["voice+age+sex+comorb (unweighted)", "voice (unweighted)"],
+                      ["voice+age+sex (unweighted)", "age+sex"],
+                      ["voice+age+sex+comorb (unweighted)", "age+sex+comorb"],
+                      ["voice (unweighted)", "voice"]]
         arms = {k: v for k, v in arms.items() if v}
         contrasts = [p for p in contrasts if p[0] in arms and p[1] in arms]
         json.dump({"arms": arms, "contrasts": contrasts}, open(out / f"{cohort}.json", "w"), indent=1)
