@@ -10,6 +10,7 @@ Usage: uv run python scripts/revision/summarize_crossdataset.py out.csv <results
 """
 import json
 import sys
+from pathlib import Path
 
 import pandas as pd
 
@@ -25,7 +26,10 @@ def main():
         d = json.load(open(f))
         subset = "+".join(d.get("uk_languages") or []) or "all"
         for r in d["results"]:
-            rows.append({"uk_subset": subset, "charite_cohort": d.get("charite_cohort_variant"),
+            # train_cross_dataset.py labels any --charite_metadata_csv as "psm_matched";
+            # 30_crossdataset.sbatch writes the full-cohort runs to <variant>_full/
+            cohort = "full" if Path(f).parent.name.endswith("_full") else d.get("charite_cohort_variant")
+            rows.append({"uk_subset": subset, "charite_cohort": cohort,
                          "preproc": d.get("preproc"), **{c: r.get(c) for c in COLS}})
     df = pd.DataFrame(rows)
     df["best_params"] = df["best_params"].astype(str)
