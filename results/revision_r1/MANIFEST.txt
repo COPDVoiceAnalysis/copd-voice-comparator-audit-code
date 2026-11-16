@@ -1,5 +1,5 @@
-collected 2026-11-15T22:41:05+00:00
-code commit b77259125c4ad0517f096374edd699742d42abe5
+collected 2026-11-16T12:36:14+00:00
+code commit eb036424200e1da12770f9a39040b581bbce651b
 SMOKE=0 PREPROC=norm_on
 features $OUT_features/2025-08-13
 
@@ -11,6 +11,10 @@ arms_uk.json
 crossdataset_summary.csv
 demographics_from_voice_charite.json
 demographics_from_voice_uk.json
+device_confound_charite.json
+device_confound_charite_unweighted.json
+device_confound_uk.json
+device_confound_uk_unweighted.json
 fold_predictions_charite.pdf
 fold_predictions_charite.png
 fold_predictions_uk.pdf

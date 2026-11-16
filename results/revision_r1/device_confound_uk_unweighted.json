@@ -1,0 +1,79 @@
+{
+ "cohort": "uk",
+ "n_scored": 902,
+ "n_with_rate": 902,
+ "counts": {
+  "8000": {
+   "copd": 4,
+   "control": 34
+  },
+  "16000": {
+   "copd": 95,
+   "control": 769
+  }
+ },
+ "rate_only_auroc": {
+  "cross_validated": 0.473,
+  "in_sample": 0.501
+ },
+ "overall_auroc": [
+  0.614,
+  0.553,
+  0.671
+ ],
+ "stratified_auroc": [
+  0.615,
+  0.554,
+  0.675
+ ],
+ "per_stratum": {
+  "8000": {
+   "auroc": 0.588,
+   "ci": [
+    0.25,
+    0.853
+   ],
+   "copd": 4,
+   "control": 34
+  },
+  "16000": {
+   "auroc": 0.615,
+   "ci": [
+    0.555,
+    0.674
+   ],
+   "copd": 95,
+   "control": 769
+  }
+ },
+ "lr_test": {
+  "rate_age_sex": {
+   "covariates": [
+    "age",
+    "male",
+    "sr_8000"
+   ],
+   "lr_chi2": 11.43,
+   "p": 0.0007243349884006144,
+   "coef_score": 4.458
+  },
+  "rate_age_sex_duration": {
+   "covariates": [
+    "age",
+    "male",
+    "sr_8000",
+    "duration_s"
+   ],
+   "lr_chi2": 8.97,
+   "p": 0.0027389729235850198,
+   "coef_score": 4.113
+  }
+ },
+ "rate_from_embeddings": {
+  "auroc_ovr": 1.0,
+  "counts": {
+   "8000": 38,
+   "16000": 864
+  }
+ }
+}

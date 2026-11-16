@@ -10,3 +10,7 @@ OK    demographics_uk
 OK    recording_summary
 OK    crossdataset
 OK    layers
+OK    device_charite
+OK    device_charite_unweighted
+OK    device_uk
+OK    device_uk_unweighted
