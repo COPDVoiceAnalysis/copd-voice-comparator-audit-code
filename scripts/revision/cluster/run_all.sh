@@ -4,13 +4,14 @@
 #   bash scripts/revision/cluster/run_all.sh [--no-layers] [--only STAGES]
 # Options
 #   --no-layers     skip the 26-run layer sweep (Reviewer 1, point 6)
-#   --only STAGES   comma list of stages to submit: features,train,comparators,xds,analysis,device
+#   --only STAGES   comma list of stages to submit: features,train,comparators,xds,analysis,xdsfull,device
+#                   (xdsfull = transfer with the full Charité cohort, N = 99; runs after analysis)
 #                   (default: all; features only if preflight said a build is needed)
 #   --local         run the stages one after another in this shell instead of
 #                   sbatch (for testing on a laptop or an interactive node)
 # Job ids are written to $OUT/state/jobs.txt. Watch with: squeue --me
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/common.sh"
-LAYERS=1; ONLY="features,train,comparators,xds,analysis,device"; LOCAL=0
+LAYERS=1; ONLY="features,train,comparators,xds,analysis,xdsfull,device"; LOCAL=0
 while [ $# -gt 0 ]; do
   case $1 in
     --no-layers) LAYERS=0 ;;
@@ -80,6 +81,10 @@ fi
 JA=""
 if want analysis; then
   JA=$(sub analysis "$(after afterany "$JT" "$JCC" "$JCU" "$JX1" "$JX2")" "$SBATCH_CPU_ARGS" 40_analysis.sbatch)
+fi
+if want xdsfull; then
+  sub xds-all-full "$(after afterany "$JA")" "$SBATCH_CPU_ARGS" 30_crossdataset.sbatch all full > /dev/null
+  sub xds-de-full "$(after afterany "$JA")" "$SBATCH_CPU_ARGS" 30_crossdataset.sbatch de full > /dev/null
 fi
 if want device; then
   sub device "$(after afterany "$JA")" "$SBATCH_CPU_ARGS" 41_device.sbatch > /dev/null
