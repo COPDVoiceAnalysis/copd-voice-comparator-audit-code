@@ -1,0 +1,10 @@
+{
+  "cohort": "uk",
+  "n_scored": 902,
+  "n_copd": 99,
+  "n_control": 803,
+  "pack_years_recorded": {
+    "copd": 0,
+    "control": 0
+  }
+}

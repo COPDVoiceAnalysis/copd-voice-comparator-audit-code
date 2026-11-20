@@ -1,0 +1,21 @@
+{
+  "cohort": "charite",
+  "n_scored": 99,
+  "n_copd": 77,
+  "n_control": 22,
+  "pack_years_recorded": {
+    "copd": 75,
+    "control": 5
+  },
+  "copd_score_vs_pack_years": {
+    "n": 75,
+    "rho": -0.109,
+    "p": 0.3512899991214658,
+    "ci": [
+      -0.351,
+      0.152
+    ],
+    "n_zero_pack_years": 0,
+    "min_pack_years": 1.0
+  }
+}

@@ -14,3 +14,7 @@ OK    device_charite
 OK    device_charite_unweighted
 OK    device_uk
 OK    device_uk_unweighted
+OK    crossdataset_de_full
+OK    crossdataset_all_full
+OK    smoking_charite
+OK    smoking_uk

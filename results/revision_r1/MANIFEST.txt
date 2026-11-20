@@ -1,5 +1,5 @@
-collected 2026-11-16T12:36:14+00:00
-code commit eb036424200e1da12770f9a39040b581bbce651b
+collected 2026-11-20T16:31:37+00:00
+code commit 10a5c4042c07ff9c3ad5d34271cd537d8859412a
 SMOKE=0 PREPROC=norm_on
 features $OUT_features/2025-08-13
 
@@ -25,4 +25,6 @@ paired_bootstrap_charite.json
 paired_bootstrap_layers.json
 paired_bootstrap_uk.json
 recording_summary.csv
+smoking_charite.json
+smoking_uk.json
 preflight_report.txt
