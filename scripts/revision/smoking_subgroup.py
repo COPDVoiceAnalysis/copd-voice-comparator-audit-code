@@ -24,6 +24,8 @@ Usage (from the repository root):
 import argparse
 import glob
 import json
+import os
+import re
 import sys
 from pathlib import Path
 
@@ -65,6 +67,62 @@ def metadata(paths, source, cols):
     return out if out is not None else pd.DataFrame(columns=cols)
 
 
+ID_COLS = ("audio_id", "uid", "Uid", "UID", "userid", "user_id")
+
+
+def find_smoking_files(root, max_depth=3):
+    """CSV files under root whose header has a smoking column and an id column."""
+    hits = []
+    root = os.path.abspath(root)
+    for d, dirs, files in os.walk(root):
+        if d[len(root):].count(os.sep) >= max_depth:
+            dirs[:] = []
+        for f in files:
+            if not f.lower().endswith(".csv"):
+                continue
+            path = os.path.join(d, f)
+            try:
+                head = pd.read_csv(path, nrows=0, sep=None, engine="python").columns
+            except Exception:  # unreadable or not a table
+                continue
+            smk = [c for c in head if re.match(r"(?i)^smok", str(c))]
+            ids = [c for c in head if c in ID_COLS]
+            if smk and ids:
+                hits.append((path, smk[0], ids))
+    return hits
+
+
+def smoking_from_raw(root, id_map):
+    """Smoking per audio_id from raw participant files, joined via audio_id directly or via uid.
+
+    id_map: CSV with audio_id and uid (the matched-cohort metadata). Returns the series
+    and a report with file names (no values) and join coverage.
+    """
+    m = pd.read_csv(id_map, low_memory=False, usecols=lambda c: c in {"audio_id", "uid"})
+    report = {"searched": os.path.abspath(root), "files": []}
+    out = pd.Series(dtype=object)
+    for path, col, ids in find_smoking_files(root):
+        t = pd.read_csv(path, sep=None, engine="python", usecols=lambda c: c == col or c in ids)
+        t[col] = t[col].astype(str).str.strip().str.lower()
+        t = t[~t[col].isin({"", "nan", "none"})]
+        if "audio_id" in ids:
+            s = t.drop_duplicates("audio_id").set_index("audio_id")[col]
+            via = "audio_id"
+        else:
+            k = ids[0]
+            # a participant can submit several times: keep the most frequent answer
+            per = t.groupby(k)[col].agg(lambda v: v.value_counts().index[0])
+            s = m.dropna(subset=["uid"]).set_index("audio_id").uid.astype(str).map(per.rename(index=str))
+            via = k
+        s = s.dropna()
+        n = int(m.audio_id.isin(s.index).sum())
+        report["files"].append({"file": os.path.basename(path), "column": col, "via": via, "matched_audio_ids": n})
+        out = out.combine_first(s) if len(out) else s
+    report["matched_total"] = int(m.audio_id.isin(out.index).sum())
+    report["cohort_size"] = int(m.audio_id.nunique())
+    return out, report
+
+
 def auc_ci(y, s):
     if len(np.unique(y)) < 2:
         return None
@@ -82,13 +140,22 @@ def main():
     ap.add_argument("--voice-run", required=True)
     ap.add_argument("--metadata", action="append", required=True)
     ap.add_argument("--out", required=True)
+    ap.add_argument("--smoking-search", help="Directory to search for raw participant CSVs with a smoking column")
+    ap.add_argument("--id-map", help="CSV with audio_id and uid, used to join raw files keyed by uid")
     a = ap.parse_args()
 
     df = scores(a.voice_run).join(metadata(a.metadata, SOURCE[a.cohort], ["smoking", "pack_years"]))
+    raw_report = None
+    if a.smoking_search:
+        raw, raw_report = smoking_from_raw(a.smoking_search, a.id_map)
+        have = df["smoking"] if "smoking" in df.columns else pd.Series(index=df.index, dtype=object)
+        df["smoking"] = have.combine_first(raw.reindex(df.index))
     out = {"cohort": a.cohort, "n_scored": int(len(df)), "n_copd": int(df.y.sum()), "n_control": int((df.y == 0).sum())}
     y, s = df.y.to_numpy(int), df.score.to_numpy(float)
 
-    if "smoking" in df.columns:
+    if raw_report is not None:
+        out["raw_smoking_source"] = raw_report
+    if "smoking" in df.columns and df.smoking.notna().any():
         sm = df.smoking.astype(str).str.strip().str.lower()
         out["smoking_by_class"] = {cls: {k: int(v) for k, v in sm[df.y == code].value_counts().items()}
                                    for cls, code in (("copd", 1), ("control", 0))}

@@ -2,7 +2,7 @@
 #SBATCH --job-name=rev-smoking
 #SBATCH --cpus-per-task=2
 #SBATCH --mem=8G
-#SBATCH --time=00:30:00
+#SBATCH --time=01:00:00
 # Voice score by smoking history (Reviewer 1, point 4; Reviewer 3, point 2).
 # Analysis only (no training); reads the finished voice runs via $OUT/arms/*.json,
 # so it needs a finished rev-analysis (or `arms.py resolve`) first.
@@ -15,9 +15,12 @@ for c in charite uk; do
   RUN=$(armrun "$ARMS/$c.json" voice 2>/dev/null)
   [ -n "$RUN" ] || { echo "FAIL  smoking_$c (voice run not found)" >> "$A/STATUS.txt"; continue; }
   log "smoking subgroup $c"
+  # COVID-19 Sounds: smoking is only in the raw participant files next to the audio
+  EXTRA=""
+  [ "$c" = uk ] && EXTRA="--smoking-search $(dirname "$UK_AUDIO_TO") --id-map data/uk_matched_metadata.csv"
   if py scripts/revision/smoking_subgroup.py --cohort "$c" --voice-run "$RUN" \
        --metadata "$OUT/merged_metadata_remapped.csv" --metadata "data/$DATE/preprocessed__$PREPROC/metadata.csv" \
-       --out "$A/smoking_$c.json" > "$OUT/logs/analysis_smoking_$c.log" 2>&1; then
+       $EXTRA --out "$A/smoking_$c.json" > "$OUT/logs/analysis_smoking_$c.log" 2>&1; then
     echo "OK    smoking_$c" >> "$A/STATUS.txt"
   else
     echo "FAIL  smoking_$c (see $OUT/logs/analysis_smoking_$c.log)" >> "$A/STATUS.txt"
