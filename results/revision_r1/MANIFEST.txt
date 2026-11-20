@@ -1,5 +1,5 @@
-collected 2026-11-20T16:31:37+00:00
-code commit 10a5c4042c07ff9c3ad5d34271cd537d8859412a
+collected 2026-11-20T18:17:40+00:00
+code commit 560267a80dea45fbfe9abe2327e88c30063280cc
 SMOKE=0 PREPROC=norm_on
 features $OUT_features/2025-08-13
 

@@ -3,6 +3,89 @@
   "n_scored": 902,
   "n_copd": 99,
   "n_control": 803,
+  "raw_smoking_source": {
+    "searched": "/data/cephfs-1/work/groups/mittermaier/cam_uk/NeurIPSData",
+    "files": [
+      {
+        "file": "results_raw_20210426_lan_yamnet_web_noloc.csv",
+        "column": "Smoking",
+        "via": "Uid",
+        "matched_audio_ids": 0
+      },
+      {
+        "file": "results_raw_20210426_lan_yamnet_android_noloc.csv",
+        "column": "Smoking",
+        "via": "Uid",
+        "matched_audio_ids": 906
+      },
+      {
+        "file": "results_raw_20210426_lan_yamnet_ios_noloc.csv",
+        "column": "Smoking",
+        "via": "Uid",
+        "matched_audio_ids": 0
+      }
+    ],
+    "matched_total": 906,
+    "cohort_size": 906
+  },
+  "smoking_by_class": {
+    "copd": {
+      "ex": 28,
+      "never": 27,
+      "11to20": 23,
+      "1to10": 20,
+      "pnts": 1
+    },
+    "control": {
+      "never": 803
+    }
+  },
+  "n_control_not_never": 0,
+  "overall": {
+    "auroc": 0.609,
+    "ci": [
+      0.551,
+      0.667
+    ],
+    "n_pos": 99,
+    "n_neg": 803
+  },
+  "never_copd_vs_controls": {
+    "auroc": 0.501,
+    "ci": [
+      0.381,
+      0.621
+    ],
+    "n_pos": 27,
+    "n_neg": 803
+  },
+  "never_copd_vs_never_controls": {
+    "auroc": 0.501,
+    "ci": [
+      0.377,
+      0.621
+    ],
+    "n_pos": 27,
+    "n_neg": 803
+  },
+  "ever_copd_vs_controls": {
+    "auroc": 0.657,
+    "ci": [
+      0.595,
+      0.719
+    ],
+    "n_pos": 71,
+    "n_neg": 803
+  },
+  "within_copd_ever_vs_never": {
+    "auroc": 0.649,
+    "ci": [
+      0.519,
+      0.772
+    ],
+    "n_pos": 71,
+    "n_neg": 27
+  },
   "pack_years_recorded": {
     "copd": 0,
     "control": 0

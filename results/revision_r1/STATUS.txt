@@ -18,3 +18,5 @@ OK    crossdataset_de_full
 OK    crossdataset_all_full
 OK    smoking_charite
 OK    smoking_uk
+OK    smoking_charite
+OK    smoking_uk
