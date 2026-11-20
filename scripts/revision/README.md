@@ -53,6 +53,7 @@ git add results/revision_r1 && git commit -m "revision: cluster results" && git 
 | R1.5 cross-cohort, same language | Charité <-> UK, once with all UK participants and once with German-language UK participants only; Charité side once PSM-matched (N = 55, stage `xds`) and once the full analysed cohort (N = 99, as in Table 3, stage `xdsfull`, taken from the participants the selected Charité voice run scored) | `src/train_cross_dataset.py --uk_languages de`, `charite_complete_metadata.py`, `summarize_crossdataset.py` | `crossdataset_summary.csv` (column `charite_cohort`: `psm_matched` or `full`) |
 | R2.3 device / sample rate | sample rate, channels and duration of the original poem recordings per cohort and class | `recording_summary.py` | `recording_summary.csv` |
 | R2.3 device confound | voice-score AUROC within each sample rate and with the rate held fixed; sample rate alone as a predictor; LR test of the score beyond age, sex and rate; sample rate decoded from the embeddings | `device_confound.py` (job `rev-device`, `run_all.sh --only device`) | `device_confound_{charite,uk}[_unweighted].json` |
+| R1.4 / R3.2 smoking | COVID-19 Sounds: voice-score AUROC for never-smoking COPD vs controls (and vs never-smoking controls), ever-smoking COPD vs controls, ever vs never within COPD; counts by smoking category. Charité: Spearman correlation of the score with pack-years within COPD | `smoking_subgroup.py` (job `rev-smoking`, `run_all.sh --only smoking`) | `smoking_{charite,uk}.json` |
 | R1.6 layer choice | Charité voice model with wav2vec2 layers 0-24 (mean pooling) and layer 4 with mean+std pooling | `arms.py make-configs --layers`, `paired_bootstrap.py` | `paired_bootstrap_layers.json` |
 | paper numbers | if the published MLflow runs are readable: the same bootstrap and operating points on the exact published runs | `arms.py published` | `published_*.json` |
 
@@ -150,6 +151,7 @@ current shell instead of Slurm (for an interactive node or testing).
 | `rev-xds-all-full`, `rev-xds-de-full` | after `rev-analysis` | 32 CPU | up to 12 h | the same with the full Charité cohort (N = 99); rebuilds `crossdataset_summary.csv`. Rerun alone: `run_all.sh --only xdsfull` |
 | `rev-analysis` | after all of the above | 4 CPU | < 1 h | all analyses, aggregate outputs to `$OUT/analysis/` |
 | `rev-device` | after `rev-analysis` | 4 CPU | < 30 min | sample-rate / device check (R2.3), adds `device_confound_*.json` |
+| `rev-smoking` | after `rev-analysis` | 2 CPU | < 10 min | voice score by smoking history (R1.4, R3.2), adds `smoking_*.json` |
 
 Logs: `$OUT/logs/<job-name>-<jobid>_<task>.out`, and per analysis step
 `$OUT/logs/analysis_<step>.log`.

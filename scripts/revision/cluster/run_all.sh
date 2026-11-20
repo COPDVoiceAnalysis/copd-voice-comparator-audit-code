@@ -4,14 +4,14 @@
 #   bash scripts/revision/cluster/run_all.sh [--no-layers] [--only STAGES]
 # Options
 #   --no-layers     skip the 26-run layer sweep (Reviewer 1, point 6)
-#   --only STAGES   comma list of stages to submit: features,train,comparators,xds,analysis,xdsfull,device
+#   --only STAGES   comma list of stages to submit: features,train,comparators,xds,analysis,xdsfull,device,smoking
 #                   (xdsfull = transfer with the full Charité cohort, N = 99; runs after analysis)
 #                   (default: all; features only if preflight said a build is needed)
 #   --local         run the stages one after another in this shell instead of
 #                   sbatch (for testing on a laptop or an interactive node)
 # Job ids are written to $OUT/state/jobs.txt. Watch with: squeue --me
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/common.sh"
-LAYERS=1; ONLY="features,train,comparators,xds,analysis,xdsfull,device"; LOCAL=0
+LAYERS=1; ONLY="features,train,comparators,xds,analysis,xdsfull,device,smoking"; LOCAL=0
 while [ $# -gt 0 ]; do
   case $1 in
     --no-layers) LAYERS=0 ;;
@@ -88,6 +88,9 @@ if want xdsfull; then
 fi
 if want device; then
   sub device "$(after afterany "$JA")" "$SBATCH_CPU_ARGS" 41_device.sbatch > /dev/null
+fi
+if want smoking; then
+  sub smoking "$(after afterany "$JA")" "$SBATCH_CPU_ARGS" 42_smoking.sbatch > /dev/null
 fi
 log "submitted; job ids in $JOBS"
 [ "$LOCAL" = 1 ] || squeue --me
